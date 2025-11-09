@@ -4,7 +4,8 @@
       "Bash(for file in /root/git/claude-code-infrastructure-showcase/.claude/skills/frontend-dev-guidelines/resources/*.md)",
       "Bash(done)",
       "Bash(cat:*)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(xargs:*)"
     ],
     "deny": [],
     "ask": []
