@@ -24,18 +24,15 @@ This repository is a **reference library** of Claude Code infrastructure compone
 ### Frontend Skills
 
 **frontend-dev-guidelines requires:**
-- React (18+)
-- MUI v7
-- TanStack Query
-- TanStack Router
-- TypeScript
+- Reflex
+- Python 3.12+
 
 **Before integrating, ask:**
-"Do you use React with MUI v7?"
+"Do you use Reflex?"
 
 **If NO:**
 ```
-The frontend-dev-guidelines skill is designed specifically for React + MUI v7. I can:
+The frontend-dev-guidelines skill is designed specifically for Reflex. I can:
 1. Help you create a similar skill adapted for [their stack] using this as a template
 2. Extract the framework-agnostic patterns (file organization, performance, etc.)
 3. Skip this skill if not relevant
@@ -46,17 +43,18 @@ Which would you prefer?
 ### Backend Skills
 
 **backend-dev-guidelines requires:**
-- Node.js/Express
-- TypeScript
-- Prisma ORM
+- Python 3.12
+- FastAPI
+- PostgreSQL
+- SQLAlchemy ORM
 - Sentry
 
 **Before integrating, ask:**
-"Do you use Node.js with Express and Prisma?"
+"Do you use Python with FastAPI and SQLAlchemy?"
 
 **If NO:**
 ```
-The backend-dev-guidelines skill is designed for Express/Prisma. I can:
+The backend-dev-guidelines skill is designed for FastAPI/SQLAlchemy. I can:
 1. Help you create similar guidelines adapted for [their stack] using this as a template
 2. Extract the architecture patterns (layered architecture works for any framework)
 3. Skip this skill
@@ -134,9 +132,10 @@ ls $CLAUDE_PROJECT_DIR/.claude/skills/skill-rules.json
   "backend-dev-guidelines": {
     "fileTriggers": {
       "pathPatterns": [
-        "packages/api/src/**/*.ts",
-        "packages/server/src/**/*.ts",
-        "apps/backend/**/*.ts"
+        "backend/**/*.py",
+        "api/**/*.py",
+        "services/*/app/**/*.py",
+        "packages/*/app/**/*.py"
       ]
     }
   }
@@ -149,8 +148,9 @@ ls $CLAUDE_PROJECT_DIR/.claude/skills/skill-rules.json
   "backend-dev-guidelines": {
     "fileTriggers": {
       "pathPatterns": [
-        "src/**/*.ts",
-        "backend/**/*.ts"
+        "app/**/*.py",
+        "src/**/*.py",
+        "backend/**/*.py"
       ]
     }
   }
@@ -161,9 +161,10 @@ ls $CLAUDE_PROJECT_DIR/.claude/skills/skill-rules.json
 ```json
 {
   "pathPatterns": [
-    "**/*.ts",          // All TypeScript files
-    "src/**/*.ts",      // Common src directory
-    "backend/**/*.ts"   // Common backend directory
+    "**/*.py",          // All Python files
+    "app/**/*.py",      // Common app directory (FastAPI convention)
+    "src/**/*.py",      // Common src directory
+    "backend/**/*.py"   // Common backend directory
   ]
 }
 ```
@@ -185,19 +186,19 @@ cat $CLAUDE_PROJECT_DIR/.claude/skills/skill-rules.json | jq .
 ### Skill-Specific Notes
 
 #### backend-dev-guidelines
-- **Tech Requirements:** Node.js/Express, Prisma, TypeScript, Sentry
-- **Ask:** "Do you use Express with Prisma?" "Where's your backend code?"
+- **Tech Requirements:** Python 3.12, FastAPI, PostgreSQL, SQLAlchemy, Sentry
+- **Ask:** "Do you use FastAPI with SQLAlchemy?" "Where's your backend code?"
 - **If different stack:** Offer to adapt using this as template
 - **Customize:** pathPatterns
-- **Example paths:** `api/`, `server/`, `backend/`, `services/*/src/`
-- **Adaptation tip:** Architecture patterns (Routes→Controllers→Services) transfer to most frameworks
+- **Example paths:** `backend/`, `api/`, `services/*/app/`, `packages/*/app/`
+- **Adaptation tip:** Architecture patterns (Routers→Dependencies→Services→Repositories) transfer to most frameworks
 
 #### frontend-dev-guidelines
-- **Tech Requirements:** React 18+, MUI v7, TanStack Query/Router, TypeScript
-- **Ask:** "Do you use React with MUI v7?" "Where's your frontend code?"
-- **If different stack:** Offer to create adapted version (Vue, Angular, etc.)
+- **Tech Requirements:** Reflex, Python 3.12+
+- **Ask:** "Do you use Reflex?" "Where's your frontend code?"
+- **If different stack:** Offer to create adapted version (other Python frameworks, etc.)
 - **Customize:** pathPatterns + all framework-specific examples
-- **Example paths:** `frontend/`, `client/`, `web/`, `apps/web/src/`
+- **Example paths:** `frontend/`, `web/`, `apps/web/`, `reflex/`
 - **Adaptation tip:** File organization and performance patterns transfer, component code doesn't
 
 #### route-tester
@@ -236,15 +237,15 @@ When user's tech stack differs from skill requirements, you have options:
    ```
 
 2. **Identify what needs changing:**
-   - Framework-specific code examples (React → Vue)
-   - Library APIs (MUI → Vuetify/PrimeVue)
+   - Framework-specific code examples (Reflex → other framework)
+   - Library APIs (Reflex UI components → other component library)
    - Import statements
    - Component patterns
 
 3. **Keep what transfers:**
    - File organization principles
    - Performance optimization strategies
-   - TypeScript standards
+   - Python type hints standards
    - General best practices
 
 4. **Replace examples systematically:**
@@ -257,13 +258,13 @@ When user's tech stack differs from skill requirements, you have options:
    - Update skill-rules.json triggers for their stack
    - Test activation
 
-**Example - Adapting frontend-dev-guidelines for Vue:**
+**Example - Adapting frontend-dev-guidelines for other frameworks:**
 ```
-I'll create vue-dev-guidelines based on the React skill structure:
-- Replace React.FC → Vue defineComponent
-- Replace useSuspenseQuery → Vue composables
-- Replace MUI components → [their component library]
-- Keep: File organization, performance patterns, TypeScript guidelines
+I'll create [framework]-dev-guidelines based on the Reflex skill structure:
+- Replace Reflex components → [their framework] components
+- Replace Reflex state classes → [their state management]
+- Replace Reflex UI components (rx.*) → [their component library]
+- Keep: File organization, performance patterns, Python type hints
 
 This will take a few minutes. Sound good?
 ```
@@ -286,8 +287,8 @@ This will take a few minutes. Sound good?
 
 **Example:**
 ```
-The backend-dev-guidelines uses Express, but the layered architecture
-(Routes → Controllers → Services → Repositories) works for Django too.
+The backend-dev-guidelines uses FastAPI, but the layered architecture
+(Routers → Dependencies → Services → Repositories) works for Django too.
 
 I can create a skill with:
 - Layered architecture pattern
@@ -322,13 +323,13 @@ Then you can add Django-specific examples as you establish patterns.
 - ✅ Input validation importance
 - ✅ Testing strategies
 - ✅ Performance optimization principles
-- ✅ TypeScript best practices
+- ✅ Python type hints best practices
 
 **Framework-Specific Code:**
-- ❌ React hooks → Don't transfer to Vue/Angular
-- ❌ MUI components → Different component libraries
-- ❌ Prisma queries → Different ORM syntax
-- ❌ Express middleware → Different framework patterns
+- ❌ Reflex state classes → Don't transfer to other frameworks
+- ❌ Reflex UI components (rx.*) → Different component libraries
+- ❌ SQLAlchemy queries → Different ORM syntax
+- ❌ FastAPI dependencies → Different framework patterns
 - ❌ Routing implementations → Framework-specific
 
 ### When to Recommend Adaptation vs Skipping
@@ -360,17 +361,24 @@ Then you can add Django-specific examples as you establish patterns.
 # Copy both files
 cp showcase/.claude/hooks/skill-activation-prompt.sh \\
    $CLAUDE_PROJECT_DIR/.claude/hooks/
-cp showcase/.claude/hooks/skill-activation-prompt.ts \\
-   $CLAUDE_PROJECT_DIR/.claude/hooks/
+# If Python hook exists, copy it
+if [ -f "showcase/.claude/hooks/skill-activation-prompt.py" ]; then
+  cp showcase/.claude/hooks/skill-activation-prompt.py \\
+     $CLAUDE_PROJECT_DIR/.claude/hooks/
+fi
 
 # Make executable
 chmod +x $CLAUDE_PROJECT_DIR/.claude/hooks/skill-activation-prompt.sh
 
 # Install dependencies if needed
-if [ -f "showcase/.claude/hooks/package.json" ]; then
-  cp showcase/.claude/hooks/package.json \\
+if [ -f "showcase/.claude/hooks/requirements.txt" ]; then
+  cp showcase/.claude/hooks/requirements.txt \\
      $CLAUDE_PROJECT_DIR/.claude/hooks/
-  cd $CLAUDE_PROJECT_DIR/.claude/hooks && npm install
+  cd $CLAUDE_PROJECT_DIR/.claude/hooks && pip install -r requirements.txt
+elif [ -f "showcase/.claude/hooks/pyproject.toml" ]; then
+  cp showcase/.claude/hooks/pyproject.toml \\
+     $CLAUDE_PROJECT_DIR/.claude/hooks/
+  cd $CLAUDE_PROJECT_DIR/.claude/hooks && pip install -e .
 fi
 ```
 
@@ -434,24 +442,25 @@ chmod +x $CLAUDE_PROJECT_DIR/.claude/hooks/post-tool-use-tracker.sh
 
 ### Optional Hooks (Require Heavy Customization)
 
-#### tsc-check.sh and trigger-build-resolver.sh (Stop hooks)
+#### type-check.sh and trigger-build-resolver.sh (Stop hooks)
 
 ⚠️ **WARNING:** These hooks are configured for a specific multi-service monorepo structure.
 
 **Before integrating, ask:**
-1. "Do you have a monorepo with multiple TypeScript services?"
+1. "Do you have a monorepo with multiple Python services?"
 2. "What are your service directory names?"
-3. "Where are your tsconfig.json files located?"
+3. "Where are your pyproject.toml or setup.py files located?"
+4. "Do you use mypy or pyright for type checking?"
 
 **For SIMPLE projects (single service):**
 - **RECOMMEND SKIPPING** these hooks
 - They're overkill for single-service projects
-- User can run `tsc --noEmit` manually instead
+- User can run `mypy .` or `pyright .` manually instead
 
 **For COMPLEX projects (multi-service monorepo):**
 
 1. Copy the files
-2. **MUST EDIT** tsc-check.sh - find this section:
+2. **MUST EDIT** type-check.sh - find this section:
 ```bash
 case "$repo" in
     email|exports|form|frontend|projects|uploads|users|utilities|events|database)
@@ -471,9 +480,18 @@ case "$repo" in
 esac
 ```
 
-4. Test manually before adding to settings.json:
+4. Update type checking command (mypy or pyright):
 ```bash
-./.claude/hooks/tsc-check.sh
+# For mypy
+mypy $SERVICE_DIR
+
+# For pyright
+pyright $SERVICE_DIR
+```
+
+5. Test manually before adding to settings.json:
+```bash
+./.claude/hooks/type-check.sh
 ```
 
 **IMPORTANT:** If this hook fails, it will block Stop events. Only add if you're sure it works for their setup.
@@ -567,18 +585,21 @@ Commands may reference dev docs paths. **Check and update:**
 ```json
 {
   "pathPatterns": [
-    "packages/*/src/**/*.ts",
-    "apps/*/src/**/*.tsx"
+    "backend/**/*.py",
+    "frontend/**/*.py",
+    "packages/*/app/**/*.py",
+    "services/*/app/**/*.py"
   ]
 }
 ```
 
-**User has Nx monorepo:**
+**User has monorepo with separate backend/frontend:**
 ```json
 {
   "pathPatterns": [
-    "apps/api/src/**/*.ts",
-    "libs/*/src/**/*.ts"
+    "backend/app/**/*.py",
+    "frontend/**/*.py",
+    "api/app/**/*.py"
   ]
 }
 ```
@@ -587,8 +608,9 @@ Commands may reference dev docs paths. **Check and update:**
 ```json
 {
   "pathPatterns": [
-    "src/**/*.ts",
-    "backend/**/*.ts"
+    "app/**/*.py",
+    "src/**/*.py",
+    "backend/**/*.py"
   ]
 }
 ```
@@ -638,9 +660,11 @@ ls -la $CLAUDE_PROJECT_DIR/.claude/hooks/*.sh
 cat $CLAUDE_PROJECT_DIR/.claude/skills/skill-rules.json | jq .
 # Should parse without errors
 
-# 3. Hook dependencies installed (if TypeScript hooks)
-ls $CLAUDE_PROJECT_DIR/.claude/hooks/node_modules/
-# Should show packages if package.json exists
+# 3. Hook dependencies installed (if Python hooks)
+# Check for virtual environment or installed packages
+ls $CLAUDE_PROJECT_DIR/.claude/hooks/.venv/ 2>/dev/null || \
+  python3 -c "import sys; print(sys.path)" | grep -q hooks
+# Should show virtual environment or packages in Python path
 
 # 4. Settings.json is valid JSON
 cat $CLAUDE_PROJECT_DIR/.claude/settings.json | jq .
@@ -693,25 +717,25 @@ I'll add the backend-dev-guidelines skill. First, I need to understand
 your project structure:
 
 1. Is this a monorepo with multiple services, or a single backend application?
-2. Where is your backend code located? (e.g., src/, backend/, server/)
-3. Do you use Express.js?
+2. Where is your backend code located? (e.g., app/, backend/, api/)
+3. Do you use FastAPI with SQLAlchemy?
 ```
 
-**User:** "Single app, code is in src/api/, yes we use Express"
+**User:** "Monorepo, code is in backend/app/, yes we use FastAPI with SQLAlchemy"
 
 **Claude should:**
 1. Copy the skill directory
-2. Update skill-rules.json with pathPattern: `"src/api/**/*.ts"`
+2. Update skill-rules.json with pathPattern: `"backend/app/**/*.py"`
 3. Verify it's copied correctly
 4. Respond:
 ```
 ✅ Added backend-dev-guidelines skill!
 
 Configuration:
-- Skill triggers when editing files in src/api/
-- Activated by keywords like "controller", "service", "route", "API"
+- Skill triggers when editing files in backend/app/
+- Activated by keywords like "router", "service", "dependency", "API"
 
-Try it: Edit a file in src/api/ and you should see the skill suggestion.
+Try it: Edit a file in backend/app/ and you should see the skill suggestion.
 ```
 
 ### Example 2: Setting Up Hooks
@@ -732,7 +756,7 @@ Do you have a .claude/settings.json file already, or should I create one?
 **Claude should:**
 1. Read their settings.json
 2. Copy both hook files
-3. Run npm install in hooks directory
+3. Install dependencies (pip install -r requirements.txt or pip install -e .) in hooks directory
 4. Add hook configurations to their settings.json (preserving existing config)
 5. Make hooks executable
 6. Respond:
@@ -776,53 +800,53 @@ The agent will review your code and provide architectural feedback.
 
 ### Example 3: Tech Stack Mismatch
 
-**User:** "Add the frontend-dev-guidelines skill to my Vue project"
+**User:** "Add the frontend-dev-guidelines skill to my Streamlit project"
 
 **Claude should:**
 ```
-I see you're using Vue. The frontend-dev-guidelines skill is specifically
-designed for React + MUI v7. I have a few options:
+I see you're using Streamlit. The frontend-dev-guidelines skill is specifically
+designed for Reflex. I have a few options:
 
-Option 1 (Recommended): I can create a vue-dev-guidelines skill using the
-React skill as a template. I'll adapt:
-- Component patterns for Vue (Composition API, defineComponent)
-- Replace MUI examples with your component library
-- Adapt data fetching for Vue patterns
-- Keep: File organization, performance principles, TypeScript standards
+Option 1 (Recommended): I can create a streamlit-dev-guidelines skill using the
+Reflex skill as a template. I'll adapt:
+- Component patterns for Streamlit (st.* components)
+- Replace Reflex state classes with Streamlit session state
+- Adapt UI patterns for Streamlit
+- Keep: File organization, performance principles, Python type hints
 
 Option 2: Extract only the framework-agnostic patterns (file organization,
-performance, testing) without React-specific code.
+performance, testing) without Reflex-specific code.
 
-Option 3: Skip it and help you create Vue guidelines from scratch.
+Option 3: Skip it and help you create Streamlit guidelines from scratch.
 
 Which would you prefer?
 ```
 
-**User:** "Option 1 sounds good, I use Vuetify"
+**User:** "Option 1 sounds good"
 
 **Claude should:**
-1. Copy frontend-dev-guidelines as vue-dev-guidelines
+1. Copy frontend-dev-guidelines as streamlit-dev-guidelines
 2. Go through each resource file
-3. Replace React patterns with Vue Composition API
-4. Replace MUI components with Vuetify
-5. Update skill-rules.json with Vue-specific triggers (.vue files)
+3. Replace Reflex patterns with Streamlit components
+4. Replace Reflex state classes with Streamlit session state
+5. Update skill-rules.json with Streamlit-specific triggers (.py files in frontend/)
 6. Respond:
 ```
-✅ Created vue-dev-guidelines skill adapted for Vue 3 + Vuetify!
+✅ Created streamlit-dev-guidelines skill adapted for Streamlit!
 
 What I changed:
-- React.FC components → Vue defineComponent
-- MUI v7 examples → Vuetify components
-- TanStack Query → Your data fetching approach
-- File patterns → .vue files
+- Reflex components → Streamlit st.* components
+- Reflex state classes → Streamlit session state
+- Reflex UI components (rx.*) → Streamlit UI components
+- File patterns → .py files in frontend/
 
 What I kept:
 - File organization (features/ pattern)
 - Performance optimization strategies
-- TypeScript standards
+- Python type hints standards
 - Loading/error state principles
 
-Try editing a .vue file - the skill should activate.
+Try editing a .py file in frontend/ - the skill should activate.
 ```
 
 ---
@@ -834,13 +858,13 @@ Try editing a .vue file - the skill should activate.
 | Component | Tech Requirements | Customization | What to Ask |
 |-----------|------------------|--------------|-------------|
 | **skill-developer** | None | ✅ None | Copy as-is |
-| **backend-dev-guidelines** | Express/Prisma/Node | ⚠️ Paths + tech check | "Use Express/Prisma?" "Where's backend?" |
-| **frontend-dev-guidelines** | React/MUI v7 | ⚠️⚠️ Paths + framework | "Use React/MUI v7?" "Where's frontend?" |
+| **backend-dev-guidelines** | FastAPI/SQLAlchemy/Python | ⚠️ Paths + tech check | "Use FastAPI/SQLAlchemy?" "Where's backend?" |
+| **frontend-dev-guidelines** | Reflex | ⚠️⚠️ Paths + framework | "Use Reflex?" "Where's frontend?" |
 | **route-tester** | JWT cookies | ⚠️ Auth + paths | "JWT cookie auth?" |
 | **error-tracking** | Sentry | ⚠️ Paths | "Use Sentry?" "Where's backend?" |
 | **skill-activation-prompt** | ✅ None | Copy as-is |
 | **post-tool-use-tracker** | ✅ None | Copy as-is |
-| **tsc-check** | ⚠️⚠️⚠️ Heavy | "Monorepo or single service?" |
+| **type-check** | ⚠️⚠️⚠️ Heavy | "Monorepo or single service?" "mypy or pyright?" |
 | **All agents** | ✅ Minimal | Check paths |
 | **All commands** | ⚠️ Paths | "Where for dev docs?" |
 
@@ -848,9 +872,9 @@ Try editing a .vue file - the skill should activate.
 
 | Component | Skip If... |
 |-----------|-----------|
-| **tsc-check hooks** | Single-service project or different build setup |
+| **type-check hooks** | Single-service project or different type checking setup |
 | **route-tester** | Not using JWT cookie authentication |
-| **frontend-dev-guidelines** | Not using React + MUI |
+| **frontend-dev-guidelines** | Not using Reflex |
 | **auth agents** | Not using JWT cookie auth |
 
 ---
