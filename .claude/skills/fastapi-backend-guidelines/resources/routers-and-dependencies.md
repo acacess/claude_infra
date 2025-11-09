@@ -307,13 +307,11 @@ async def delete_item(item_id: int) -> None:
 ### Query Parameters
 
 ```python
-from typing import Optional
-
 @router.get("/items/")
 async def list_items(
     skip: int = 0,
     limit: int = 100,
-    search: Optional[str] = None,
+    search: str | None = None,
     is_active: bool = True,
     service: ItemService = Depends(get_item_service)
 ) -> list[ItemResponse]:

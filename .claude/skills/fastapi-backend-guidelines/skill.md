@@ -255,7 +255,7 @@ import sentry_sdk
 from sentry_sdk.integrations.fastapi import FastApiIntegration
 
 # Typing
-from typing import AsyncGenerator, Optional, List
+from typing import AsyncGenerator
 ```
 
 ---

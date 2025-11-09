@@ -45,7 +45,6 @@ class Post(Base):
 # app/schemas/post.py
 from pydantic import BaseModel, Field
 from datetime import datetime
-from typing import Optional
 
 class PostBase(BaseModel):
     """Base post schema."""
@@ -59,16 +58,16 @@ class PostCreate(PostBase):
 
 class PostUpdate(BaseModel):
     """Schema for updating a post (all fields optional)."""
-    title: Optional[str] = Field(None, min_length=1, max_length=200)
-    content: Optional[str] = Field(None, min_length=1)
-    is_published: Optional[bool] = None
+    title: str | None = Field(None, min_length=1, max_length=200)
+    content: str | None = Field(None, min_length=1)
+    is_published: bool | None = None
 
 class PostResponse(PostBase):
     """Schema for post response."""
     id: int
     author_id: int
     created_at: datetime
-    updated_at: Optional[datetime] = None
+    updated_at: datetime | None = None
 
     class Config:
         from_attributes = True
@@ -87,7 +86,6 @@ class PostListResponse(BaseModel):
 # app/repositories/post_repository.py
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, and_
-from typing import Optional
 from datetime import datetime
 
 from app.models.post import Post
@@ -98,7 +96,7 @@ class PostRepository:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def get_by_id(self, post_id: int) -> Optional[Post]:
+    async def get_by_id(self, post_id: int) -> Post | None:
         """Get post by ID."""
         result = await self.db.execute(
             select(Post).where(Post.id == post_id)
@@ -180,9 +178,9 @@ class PostRepository:
     async def update(
         self,
         post: Post,
-        title: Optional[str] = None,
-        content: Optional[str] = None,
-        is_published: Optional[bool] = None
+        title: str | None = None,
+        content: str | None = None,
+        is_published: bool | None = None
     ) -> Post:
         """Update a post."""
         if title is not None:

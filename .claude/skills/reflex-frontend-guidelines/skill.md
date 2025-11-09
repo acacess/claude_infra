@@ -149,11 +149,11 @@ class PostState(rx.State):
 ### 2. Type Hints on Everything
 
 ```python
-from typing import List, Dict, Optional
+from typing import Any
 
 class UserState(rx.State):
-    users: List[Dict[str, any]] = []
-    current_user: Optional[Dict[str, any]] = None
+    users: list[dict[str, Any]] = []
+    current_user: dict[str, Any] | None = None
     page: int = 1
 
     async def get_user(self, user_id: int) -> None:
@@ -267,7 +267,7 @@ components/
 import reflex as rx
 
 # Typing
-from typing import List, Dict, Optional, Any
+from typing import Any
 
 # Async HTTP
 import httpx

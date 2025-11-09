@@ -18,14 +18,14 @@ End-to-end working examples demonstrating all Reflex patterns together.
 # features/posts/states/post_state.py
 import reflex as rx
 import httpx
-from typing import List, Dict, Optional
+from typing import Any
 
 class PostState(rx.State):
     """State for blog post management."""
 
     # Data
-    posts: List[Dict[str, any]] = []
-    current_post: Optional[Dict[str, any]] = None
+    posts: list[dict[str, Any]] = []
+    current_post: dict[str, Any] | None = None
 
     # UI State
     loading: bool = False
@@ -39,12 +39,12 @@ class PostState(rx.State):
 
     # Computed vars
     @rx.var
-    def published_posts(self) -> List[Dict[str, any]]:
+    def published_posts(self) -> list[dict[str, Any]]:
         """Get only published posts."""
         return [p for p in self.posts if p.get("is_published", False)]
 
     @rx.var
-    def draft_posts(self) -> List[Dict[str, any]]:
+    def draft_posts(self) -> list[dict[str, Any]]:
         """Get only draft posts."""
         return [p for p in self.posts if not p.get("is_published", False)]
 
@@ -456,14 +456,14 @@ def post_detail_page() -> rx.Component:
 # features/auth/states/auth_state.py
 import reflex as rx
 import httpx
-from typing import Optional, Dict
+from typing import Any
 
 class AuthState(rx.State):
     """Authentication state."""
 
     access_token: str = ""
     refresh_token: str = ""
-    user: Optional[Dict[str, any]] = None
+    user: dict[str, Any] | None = None
 
     # Form state
     login_email: str = ""

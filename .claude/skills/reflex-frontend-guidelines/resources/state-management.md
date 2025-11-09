@@ -404,12 +404,12 @@ def dashboard() -> rx.Component:
 ### 1. Type Everything
 
 ```python
-from typing import List, Dict, Optional
+from typing import Any
 
 class TypedState(rx.State):
     """State with full type hints."""
-    items: List[Dict[str, any]] = []
-    selected: Optional[int] = None
+    items: list[dict[str, Any]] = []
+    selected: int | None = None
     count: int = 0
     loading: bool = False
 
