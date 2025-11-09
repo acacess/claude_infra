@@ -21,43 +21,65 @@ This repository is a **reference library** of Claude Code infrastructure compone
 
 **CRITICAL:** Before integrating a skill, verify the user's tech stack matches the skill requirements.
 
-### Frontend Skills
+### Available Skills by Tech Stack
 
-**frontend-dev-guidelines requires:**
-- Reflex
+This repository contains skills for **two different tech stacks**:
+
+#### Python Stack (FastAPI + Reflex)
+
+**fastapi-backend-guidelines:**
 - Python 3.12+
-
-**Before integrating, ask:**
-"Do you use Reflex?"
-
-**If NO:**
-```
-The frontend-dev-guidelines skill is designed specifically for Reflex. I can:
-1. Help you create a similar skill adapted for [their stack] using this as a template
-2. Extract the framework-agnostic patterns (file organization, performance, etc.)
-3. Skip this skill if not relevant
-
-Which would you prefer?
-```
-
-### Backend Skills
-
-**backend-dev-guidelines requires:**
-- Python 3.12
 - FastAPI
 - PostgreSQL
-- SQLAlchemy ORM
+- SQLAlchemy ORM (async)
+- Pydantic validation
 - Sentry
 
-**Before integrating, ask:**
-"Do you use Python with FastAPI and SQLAlchemy?"
+**reflex-frontend-guidelines:**
+- Reflex (Python web framework)
+- Python 3.12+
+- State-based architecture
 
-**If NO:**
+#### Node.js Stack (Express + React)
+
+**backend-dev-guidelines:**
+- Node.js
+- Express
+- TypeScript
+- Prisma ORM
+- Zod validation
+- Sentry
+
+**frontend-dev-guidelines:**
+- React
+- TypeScript
+- MUI v7
+- TanStack Query/Router
+
+### How to Choose the Right Skills
+
+**Before integrating, ask:**
+1. "What's your backend stack: Python/FastAPI or Node.js/Express?"
+2. "What's your frontend stack: Reflex or React/TypeScript?"
+
+**Then integrate the matching skills:**
+
+| User's Stack | Use These Skills |
+|--------------|------------------|
+| Python + FastAPI + Reflex | `fastapi-backend-guidelines` + `reflex-frontend-guidelines` |
+| Node.js + Express + React | `backend-dev-guidelines` + `frontend-dev-guidelines` |
+| Mixed or different | Offer to adapt using skills as templates |
+
+**If user has different stack:**
 ```
-The backend-dev-guidelines skill is designed for FastAPI/SQLAlchemy. I can:
-1. Help you create similar guidelines adapted for [their stack] using this as a template
-2. Extract the architecture patterns (layered architecture works for any framework)
-3. Skip this skill
+I see you're using [their stack]. This repository has skills for:
+- Python (FastAPI + Reflex)
+- Node.js (Express + React)
+
+I can:
+1. Adapt one of these skills as a template for your stack
+2. Extract framework-agnostic patterns (layered architecture, etc.)
+3. Skip the stack-specific skills
 
 Which would you prefer?
 ```
@@ -185,21 +207,37 @@ cat $CLAUDE_PROJECT_DIR/.claude/skills/skill-rules.json | jq .
 
 ### Skill-Specific Notes
 
-#### backend-dev-guidelines
-- **Tech Requirements:** Python 3.12, FastAPI, PostgreSQL, SQLAlchemy, Sentry
+#### fastapi-backend-guidelines (Python/FastAPI)
+- **Tech Requirements:** Python 3.12+, FastAPI, PostgreSQL, SQLAlchemy (async), Sentry
 - **Ask:** "Do you use FastAPI with SQLAlchemy?" "Where's your backend code?"
 - **If different stack:** Offer to adapt using this as template
 - **Customize:** pathPatterns
-- **Example paths:** `backend/`, `api/`, `services/*/app/`, `packages/*/app/`
-- **Adaptation tip:** Architecture patterns (Routers→Dependencies→Services→Repositories) transfer to most frameworks
+- **Example paths:** `backend/`, `api/`, `app/`, `services/*/app/`
+- **Adaptation tip:** Architecture patterns (Routers→Dependencies→Services→Repositories) transfer to most Python frameworks
 
-#### frontend-dev-guidelines
+#### backend-dev-guidelines (Node.js/Express)
+- **Tech Requirements:** Node.js, Express, TypeScript, Prisma ORM, Sentry
+- **Ask:** "Do you use Express with Prisma?" "Where's your backend code?"
+- **If different stack:** Offer to adapt using this as template
+- **Customize:** pathPatterns
+- **Example paths:** `backend/`, `api/`, `services/*/src/`, `packages/*/src/`
+- **Adaptation tip:** Architecture patterns (Routes→Controllers→Services→Repositories) transfer to most Node.js frameworks
+
+#### reflex-frontend-guidelines (Python/Reflex)
 - **Tech Requirements:** Reflex, Python 3.12+
 - **Ask:** "Do you use Reflex?" "Where's your frontend code?"
-- **If different stack:** Offer to create adapted version (other Python frameworks, etc.)
+- **If different stack:** Offer to create adapted version
 - **Customize:** pathPatterns + all framework-specific examples
-- **Example paths:** `frontend/`, `web/`, `apps/web/`, `reflex/`
-- **Adaptation tip:** File organization and performance patterns transfer, component code doesn't
+- **Example paths:** `frontend/`, `web/`, `app/`, `reflex/`
+- **Adaptation tip:** State management and file organization patterns may transfer to similar Python web frameworks
+
+#### frontend-dev-guidelines (React/TypeScript)
+- **Tech Requirements:** React, TypeScript, MUI v7, TanStack Query/Router
+- **Ask:** "Do you use React with TypeScript?" "Where's your frontend code?"
+- **If different stack:** Offer to create adapted version (Vue, Angular, etc.)
+- **Customize:** pathPatterns + framework-specific examples
+- **Example paths:** `frontend/`, `web/`, `apps/web/`, `src/`
+- **Adaptation tip:** Component patterns and file organization transfer across React-like frameworks, but library APIs don't
 
 #### route-tester
 - **Tech Requirements:** JWT cookie-based authentication (framework agnostic)

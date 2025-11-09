@@ -218,6 +218,111 @@
                     "captureMessage"
                 ]
             }
+        },
+        "fastapi-backend-guidelines": {
+            "type": "domain",
+            "enforcement": "suggest",
+            "priority": "high",
+            "description": "Backend development patterns for Python/FastAPI/SQLAlchemy",
+            "promptTriggers": {
+                "keywords": [
+                    "backend",
+                    "backend development",
+                    "FastAPI",
+                    "router",
+                    "dependency",
+                    "service",
+                    "repository",
+                    "API",
+                    "endpoint",
+                    "SQLAlchemy",
+                    "Pydantic",
+                    "async",
+                    "database access",
+                    "dependency injection",
+                    "alembic",
+                    "migration"
+                ],
+                "intentPatterns": [
+                    "(create|add|implement|build).*?(route|router|endpoint|API|dependency|service|repository)",
+                    "(fix|handle|debug).*?(error|exception|backend)",
+                    "(add|implement).*?(validation|error.*?handling|middleware)",
+                    "(organize|structure|refactor).*?(backend|service|API)",
+                    "(how to|best practice).*?(backend|FastAPI|router|dependency|service)"
+                ]
+            },
+            "fileTriggers": {
+                "pathPatterns": [
+                    "app/**/*.py",
+                    "backend/app/**/*.py",
+                    "api/app/**/*.py",
+                    "services/**/app/**/*.py",
+                    "**/routers/**/*.py",
+                    "**/dependencies/**/*.py",
+                    "**/services/**/*.py",
+                    "**/repositories/**/*.py"
+                ],
+                "pathExclusions": [
+                    "**/*_test.py",
+                    "**/test_*.py",
+                    "**/__pycache__/**"
+                ],
+                "contentPatterns": [
+                    "from fastapi import",
+                    "@router\\.",
+                    "APIRouter\\(",
+                    "Depends\\(",
+                    "async def.*AsyncSession"
+                ]
+            }
+        },
+        "reflex-frontend-guidelines": {
+            "type": "domain",
+            "enforcement": "suggest",
+            "priority": "high",
+            "description": "Frontend development patterns for Reflex (Python web framework)",
+            "promptTriggers": {
+                "keywords": [
+                    "component",
+                    "reflex component",
+                    "UI",
+                    "page",
+                    "state",
+                    "State class",
+                    "event handler",
+                    "frontend",
+                    "Reflex",
+                    "rx."
+                ],
+                "intentPatterns": [
+                    "(create|add|make|build|update|modify).*?(component|UI|page|state)",
+                    "(how to|best practice).*?(component|reflex|state)",
+                    "(style|design|layout).*?(component|UI|page)"
+                ]
+            },
+            "fileTriggers": {
+                "pathPatterns": [
+                    "app/**/*.py",
+                    "frontend/**/*.py",
+                    "pages/**/*.py",
+                    "features/**/*.py",
+                    "**/states/**/*.py",
+                    "**/components/**/*.py"
+                ],
+                "pathExclusions": [
+                    "**/*_test.py",
+                    "**/test_*.py",
+                    "**/__pycache__/**",
+                    "**/alembic/**"
+                ],
+                "contentPatterns": [
+                    "import reflex as rx",
+                    "rx\\.",
+                    "class.*\\(rx\\.State\\):",
+                    "@rx\\.page",
+                    "@rx\\.var"
+                ]
+            }
         }
     },
     "notes": {
