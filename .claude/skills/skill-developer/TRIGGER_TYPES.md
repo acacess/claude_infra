@@ -123,12 +123,13 @@ Domain/area-specific activation based on file location in the project.
 ```json
 "fileTriggers": {
   "pathPatterns": [
-    "frontend/src/**/*.tsx",
-    "form/src/**/*.ts"
+    "frontend/src/**/*.pyx",
+    "form/src/**/*.py"
   ],
   "pathExclusions": [
-    "**/*.test.ts",
-    "**/*.spec.ts"
+    "**/test_*.py",
+    "**/*_test.py",
+    "**/tests/**/*.py"
   ]
 }
 ```
@@ -138,20 +139,20 @@ Domain/area-specific activation based on file location in the project.
 - `**` = Any number of directories (including zero)
 - `*` = Any characters within a directory name
 - Examples:
-  - `frontend/src/**/*.tsx` = All .tsx files in frontend/src and subdirs
-  - `**/schema.prisma` = schema.prisma anywhere in project
-  - `form/src/**/*.ts` = All .ts files in form/src subdirs
+  - `frontend/src/**/*.pyx` = All .pyx files in frontend/src and subdirs
+  - `**/supabase/migrations/**/*.sql` = Supabase migration files anywhere in project
+  - `form/src/**/*.py` = All .py files in form/src subdirs
 
 ### Example
 
-- File being edited: `frontend/src/components/Dashboard.tsx`
-- Matches: `frontend/src/**/*.tsx`
+- File being edited: `frontend/src/components/Dashboard.pyx`
+- Matches: `frontend/src/**/*.pyx`
 - Activates: `frontend-dev-guidelines`
 
 ### Best Practices
 
 - Be specific to avoid false positives
-- Use exclusions for test files: `**/*.test.ts`
+- Use exclusions for test files: `**/test_*.py` or `**/*_test.py`
 - Consider subdirectory structure
 - Test patterns with actual file paths
 - Use narrower patterns when possible: `form/src/services/**` not `form/**`
@@ -160,28 +161,28 @@ Domain/area-specific activation based on file location in the project.
 
 ```glob
 # Frontend
-frontend/src/**/*.tsx        # All React components
-frontend/src/**/*.ts         # All TypeScript files
+frontend/src/**/*.pyx        # All Reflex components
+frontend/src/**/*.py         # All Python files
 frontend/src/components/**   # Only components directory
 
 # Backend Services
-form/src/**/*.ts            # Form service
-email/src/**/*.ts           # Email service
-users/src/**/*.ts           # Users service
+form/src/**/*.py            # Form service
+email/src/**/*.py           # Email service
+users/src/**/*.py           # Users service
 
 # Database
-**/schema.prisma            # Prisma schema (anywhere)
-**/migrations/**/*.sql      # Migration files
-database/src/**/*.ts        # Database scripts
+**/supabase/migrations/**/*.sql      # Supabase migration files
+**/supabase/**/*.sql                 # Supabase SQL files
+database/src/**/*.py                  # Database scripts
 
 # Workflows
-form/src/workflow/**/*.ts              # Workflow engine
+form/src/workflow/**/*.py              # Workflow engine
 form/src/workflow-definitions/**/*.json # Workflow definitions
 
 # Test Exclusions
-**/*.test.ts                # TypeScript tests
-**/*.test.tsx               # React component tests
-**/*.spec.ts                # Spec files
+**/test_*.py                # Python tests (test_*.py)
+**/*_test.py               # Python tests (*_test.py)
+**/tests/**/*.py           # Tests directory
 ```
 
 ---
@@ -194,37 +195,38 @@ Regex pattern matching against the file's actual content (what's inside the file
 
 ### Use For
 
-Technology-specific activation based on what the code imports or uses (Prisma, controllers, specific libraries).
+Technology-specific activation based on what the code imports or uses (Supabase, FastAPI routes, specific libraries).
 
 ### Configuration
 
 ```json
 "fileTriggers": {
   "contentPatterns": [
-    "import.*[Pp]risma",
-    "PrismaService",
-    "\\.findMany\\(",
-    "\\.create\\("
+    "from supabase import",
+    "import supabase",
+    "create_client",
+    "\\.table\\(",
+    "\\.select\\("
   ]
 }
 ```
 
 ### Examples
 
-**Prisma Detection:**
-- File contains: `import { PrismaService } from '@project/database'`
-- Matches: `import.*[Pp]risma`
+**Supabase Detection:**
+- File contains: `from supabase import create_client`
+- Matches: `from supabase import`
 - Activates: `database-verification`
 
-**Controller Detection:**
-- File contains: `export class UserController {`
-- Matches: `export class.*Controller`
+**FastAPI Route Detection:**
+- File contains: `@app.get("/users")` or `@app.post("/users")`
+- Matches: `@app\\.(get|post|put|delete|patch)`
 - Activates: `error-tracking`
 
 ### Best Practices
 
-- Match imports: `import.*[Pp]risma` (case-insensitive with [Pp])
-- Escape special regex chars: `\\.findMany\\(` not `.findMany(`
+- Match imports: `from supabase import` or `import supabase`
+- Escape special regex chars: `\\.table\\(` not `.table(`
 - Patterns use case-insensitive flag
 - Test against real file content
 - Make patterns specific enough to avoid false matches
@@ -232,29 +234,32 @@ Technology-specific activation based on what the code imports or uses (Prisma, c
 ### Common Content Patterns
 
 ```regex
-# Prisma/Database
-import.*[Pp]risma                # Prisma imports
-PrismaService                    # PrismaService usage
-prisma\.                         # prisma.something
-\.findMany\(                     # Prisma query methods
-\.create\(
+# Supabase/Database
+from supabase import             # Supabase imports
+import supabase                  # Supabase imports (alternative)
+create_client                    # Supabase client creation
+supabase\.                       # supabase.something
+\.table\(                        # Supabase query methods
+\.select\(
+\.insert\(
 \.update\(
 \.delete\(
+\.from_\(
 
-# Controllers/Routes
-export class.*Controller         # Controller classes
-router\.                         # Express router
-app\.(get|post|put|delete|patch) # Express app routes
+# FastAPI Routes
+@app\.(get|post|put|delete|patch) # FastAPI route decorators
+from fastapi import              # FastAPI imports
+APIRouter                        # FastAPI router
 
 # Error Handling
-try\s*\{                        # Try blocks
-catch\s*\(                      # Catch blocks
-throw new                        # Throw statements
+try\s*:                          # Try blocks
+except\s*:                       # Except blocks
+raise\s+                         # Raise statements
 
-# React/Components
-export.*React\.FC               # React functional components
-export default function.*       # Default function exports
-useState|useEffect              # React hooks
+# Reflex/Components
+import reflex as rx              # Reflex imports
+rx\.                             # Reflex component usage
+def\s+\w+\(\)\s*->\s*rx\.       # Reflex component functions
 ```
 
 ---
@@ -283,16 +288,16 @@ useState|useEffect              # React hooks
 **Test keyword/intent triggers:**
 ```bash
 echo '{"session_id":"test","prompt":"your test prompt"}' | \
-  npx tsx .claude/hooks/skill-activation-prompt.ts
+  python .claude/hooks/skill-activation-prompt.py
 ```
 
 **Test file path/content triggers:**
 ```bash
-cat <<'EOF' | npx tsx .claude/hooks/skill-verification-guard.ts
+cat <<'EOF' | python .claude/hooks/skill-verification-guard.py
 {
   "session_id": "test",
   "tool_name": "Edit",
-  "tool_input": {"file_path": "/path/to/test/file.ts"}
+  "tool_input": {"file_path": "/path/to/test/file.py"}
 }
 EOF
 ```

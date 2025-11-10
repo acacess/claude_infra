@@ -23,7 +23,7 @@ User submits prompt
     ↓
 skill-activation-prompt.sh executes
     ↓
-npx tsx skill-activation-prompt.ts
+python skill-activation-prompt.py
     ↓
 Hook reads stdin (JSON with prompt)
     ↓
@@ -90,7 +90,7 @@ Claude calls Edit/Write tool
     ↓
 skill-verification-guard.sh executes
     ↓
-npx tsx skill-verification-guard.ts
+python skill-verification-guard.py
     ↓
 Hook reads stdin (JSON with tool_name, tool_input)
     ↓
@@ -139,7 +139,7 @@ IF ALLOWED:
   "hook_event_name": "PreToolUse",
   "tool_name": "Edit",
   "tool_input": {
-    "file_path": "/root/git/your-project/form/src/services/user.ts",
+    "file_path": "/root/git/your-project/form/src/services/user.py",
     "old_string": "...",
     "new_string": "..."
   }
@@ -157,10 +157,10 @@ IF ALLOWED:
 3. Check database structure with DESCRIBE commands
 4. Then retry this edit
 
-Reason: Prevent column name errors in Prisma queries
-File: form/src/services/user.ts
+Reason: Prevent column name errors in Supabase queries
+File: form/src/services/user.py
 
-💡 TIP: Add '// @skip-validation' comment to skip future checks
+💡 TIP: Add '# @skip-validation' comment to skip future checks
 ```
 
 Claude receives this message and understands it needs to use the skill before retrying the edit.
@@ -191,10 +191,10 @@ This is THE critical mechanism for enforcement:
 ### Example Conversation Flow
 
 ```
-User: "Add a new user service with Prisma"
+User: "Add a new user service with Supabase"
 
 Claude: "I'll create the user service..."
-    [Attempts to Edit form/src/services/user.ts]
+    [Attempts to Edit form/src/services/user.py]
 
 PreToolUse Hook: [Exit code 2]
     stderr: "⚠️ BLOCKED - Use database-verification"
@@ -232,7 +232,7 @@ Prevent repeated nagging in the same session - once Claude uses a skill, don't b
 
 ### How It Works
 
-1. **First edit** of file with Prisma:
+1. **First edit** of file with Supabase:
    - Hook blocks with exit code 2
    - Updates session state: adds "database-verification" to skills_used
    - Claude sees message, uses skill

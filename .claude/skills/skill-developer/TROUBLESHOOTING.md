@@ -49,7 +49,7 @@ Complete debugging guide for skill activation problems.
 **Example:**
 ```json
 "intentPatterns": [
-  "(create|add).*?(database.*?table)"  // Too specific
+  "(create|add).*?(database.*?table)"  # Too specific
 ]
 ```
 - "create a database table" → ✅ Matches
@@ -58,7 +58,7 @@ Complete debugging guide for skill activation problems.
 **Fix:** Broaden the pattern:
 ```json
 "intentPatterns": [
-  "(create|add).*?(table|database)"  // Better
+  "(create|add).*?(table|database)"  # Better
 ]
 ```
 
@@ -75,8 +75,8 @@ Complete debugging guide for skill activation problems.
 name: project-catalog-developer
 ```
 ```json
-// skill-rules.json
-"project-catalogue-developer": {  // ❌ Typo: catalogue vs catalog
+# skill-rules.json
+"project-catalogue-developer": {  # ❌ Typo: catalogue vs catalog
   ...
 }
 ```
@@ -106,7 +106,7 @@ Test the hook manually:
 
 ```bash
 echo '{"session_id":"debug","prompt":"your test prompt here"}' | \
-  npx tsx .claude/hooks/skill-activation-prompt.ts
+  python .claude/hooks/skill-activation-prompt.py
 ```
 
 Expected: Your skill should appear in the output.
@@ -129,12 +129,12 @@ Expected: Your skill should appear in the output.
 **Example:**
 ```json
 "pathPatterns": [
-  "frontend/src/**/*.tsx"
+  "frontend/src/**/*.pyx"
 ]
 ```
-- Editing: `frontend/src/components/Dashboard.tsx` → ✅ Matches
-- Editing: `frontend/tests/Dashboard.test.tsx` → ✅ Matches (add exclusion!)
-- Editing: `backend/src/app.ts` → ❌ Doesn't match
+- Editing: `frontend/src/components/Dashboard.pyx` → ✅ Matches
+- Editing: `frontend/tests/test_dashboard.pyx` → ✅ Matches (add exclusion!)
+- Editing: `backend/src/app.py` → ❌ Doesn't match
 
 **Fix:** Adjust glob patterns or add the missing path
 
@@ -147,12 +147,13 @@ Expected: Your skill should appear in the output.
 **Example:**
 ```json
 "pathExclusions": [
-  "**/*.test.ts",
-  "**/*.spec.ts"
+  "**/test_*.py",
+  "**/*_test.py",
+  "**/tests/**/*.py"
 ]
 ```
-- Editing: `services/user.test.ts` → ❌ Excluded
-- Editing: `services/user.ts` → ✅ Not excluded
+- Editing: `services/test_user.py` → ❌ Excluded
+- Editing: `services/user.py` → ✅ Not excluded
 
 **Fix:** If test exclusion too broad, narrow it or remove
 
@@ -166,16 +167,16 @@ Expected: Your skill should appear in the output.
 **Example:**
 ```json
 "contentPatterns": [
-  "import.*[Pp]risma"
+  "from supabase import"
 ]
 ```
-- File has: `import { PrismaService } from './prisma'` → ✅ Matches
-- File has: `import { Database } from './db'` → ❌ Doesn't match
+- File has: `from supabase import create_client` → ✅ Matches
+- File has: `from database import Database` → ❌ Doesn't match
 
 **Debug:**
 ```bash
 # Check if pattern exists in file
-grep -i "prisma" path/to/file.ts
+grep -i "supabase" path/to/file.py
 ```
 
 **Fix:** Adjust content patterns or add missing imports
@@ -207,7 +208,7 @@ rm .claude/hooks/state/skills-used-{session-id}.json
 
 **Check file for skip marker:**
 ```bash
-grep "@skip-validation" path/to/file.ts
+grep "@skip-validation" path/to/file.py
 ```
 
 If found, the file is permanently skipped.
@@ -234,11 +235,11 @@ unset SKIP_DB_VERIFICATION
 Test the hook manually:
 
 ```bash
-cat <<'EOF' | npx tsx .claude/hooks/skill-verification-guard.ts 2>&1
+cat <<'EOF' | python .claude/hooks/skill-verification-guard.py 2>&1
 {
   "session_id": "debug",
   "tool_name": "Edit",
-  "tool_input": {"file_path": "/root/git/your-project/form/src/services/user.ts"}
+  "tool_input": {"file_path": "/root/git/your-project/form/src/services/user.py"}
 }
 EOF
 echo "Exit code: $?"
@@ -260,7 +261,7 @@ Expected:
 
 **Problem:**
 ```json
-"keywords": ["user", "system", "create"]  // Too broad
+"keywords": ["user", "system", "create"]  # Too broad
 ```
 - Triggers on: "user manual", "file system", "create directory"
 
@@ -278,7 +279,7 @@ Expected:
 **Problem:**
 ```json
 "intentPatterns": [
-  "(create)"  // Matches everything with "create"
+  "(create)"  # Matches everything with "create"
 ]
 ```
 - Triggers on: "create file", "create folder", "create account"
@@ -286,7 +287,7 @@ Expected:
 **Solution:** Add context to patterns
 ```json
 "intentPatterns": [
-  "(create|add).*?(database|table|feature)"  // More specific
+  "(create|add).*?(database|table|feature)"  # More specific
 ]
 ```
 
@@ -300,7 +301,7 @@ Expected:
 **Problem:**
 ```json
 "pathPatterns": [
-  "form/**"  // Matches everything in form/
+  "form/**"  # Matches everything in form/
 ]
 ```
 - Triggers on: test files, config files, everything
@@ -308,8 +309,8 @@ Expected:
 **Solution:** Use narrower patterns
 ```json
 "pathPatterns": [
-  "form/src/services/**/*.ts",  // Only service files
-  "form/src/controllers/**/*.ts"
+  "form/src/services/**/*.py",  # Only service files
+  "form/src/controllers/**/*.py"
 ]
 ```
 
@@ -318,18 +319,18 @@ Expected:
 **Problem:**
 ```json
 "contentPatterns": [
-  "Prisma"  // Matches in comments, strings, etc.
+  "Supabase"  # Matches in comments, strings, etc.
 ]
 ```
-- Triggers on: `// Don't use Prisma here`
-- Triggers on: `const note = "Prisma is cool"`
+- Triggers on: `# Don't use Supabase here`
+- Triggers on: `note = "Supabase is cool"`
 
 **Solution:** Make patterns more specific
 ```json
 "contentPatterns": [
-  "import.*[Pp]risma",        // Only imports
-  "PrismaService\\.",         // Only actual usage
-  "prisma\\.(findMany|create)" // Specific methods
+  "from supabase import",        # Only imports
+  "create_client",               # Only actual usage
+  "supabase\\.(table|select)"    # Specific methods
 ]
 ```
 
@@ -339,7 +340,7 @@ Expected:
 
 ```json
 {
-  "enforcement": "block"  // Change to "suggest"
+  "enforcement": "block"  # Change to "suggest"
 }
 ```
 
@@ -406,32 +407,41 @@ Expected: `#!/bin/bash`
 
 **Fix:** Add correct shebang to first line
 
-### 4. npx/tsx Not Available
+### 4. Python Not Available
 
 **Check:**
 ```bash
-npx tsx --version
+python --version
 ```
 
-Expected: Version number
+Expected: Python 3.12 or higher
 
-**Fix:** Install dependencies:
+**Fix:** Install Python 3.12+ or use `uv`:
 ```bash
-cd .claude/hooks
-npm install
+# Using uv (recommended)
+uv python install 3.12
+
+# Or install Python directly
+# macOS: brew install python@3.12
+# Linux: apt install python3.12
 ```
 
-### 5. TypeScript Compilation Error
+### 5. Python Syntax Error
 
 **Check:**
 ```bash
 cd .claude/hooks
-npx tsc --noEmit skill-activation-prompt.ts
+python -m py_compile skill-activation-prompt.py
 ```
 
 Expected: No output (no errors)
 
-**Fix:** Correct TypeScript syntax errors
+**Alternative:** Use mypy for type checking:
+```bash
+mypy skill-activation-prompt.py
+```
+
+**Fix:** Correct Python syntax errors
 
 ---
 
@@ -470,15 +480,15 @@ Expected: No output (no errors)
 **Problem:**
 ```json
 "pathPatterns": [
-  "**/*.ts"  // Checks ALL TypeScript files
+  "**/*.py"  # Checks ALL Python files
 ]
 ```
 
 **Solution:** Be more specific
 ```json
 "pathPatterns": [
-  "form/src/services/**/*.ts",  // Only specific directory
-  "form/src/controllers/**/*.ts"
+  "form/src/services/**/*.py",  # Only specific directory
+  "form/src/controllers/**/*.py"
 ]
 ```
 
@@ -494,11 +504,11 @@ Content pattern matching reads entire file - slow for large files.
 
 ```bash
 # UserPromptSubmit
-time echo '{"prompt":"test"}' | npx tsx .claude/hooks/skill-activation-prompt.ts
+time echo '{"prompt":"test"}' | python .claude/hooks/skill-activation-prompt.py
 
 # PreToolUse
-time cat <<'EOF' | npx tsx .claude/hooks/skill-verification-guard.ts
-{"tool_name":"Edit","tool_input":{"file_path":"test.ts"}}
+time cat <<'EOF' | python .claude/hooks/skill-verification-guard.py
+{"tool_name":"Edit","tool_input":{"file_path":"test.py"}}
 EOF
 ```
 

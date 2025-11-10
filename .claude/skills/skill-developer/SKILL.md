@@ -30,14 +30,14 @@ Automatically activates when you mention:
 ### Two-Hook Architecture
 
 **1. UserPromptSubmit Hook** (Proactive Suggestions)
-- **File**: `.claude/hooks/skill-activation-prompt.ts`
+- **File**: `.claude/hooks/skill-activation-prompt.py`
 - **Trigger**: BEFORE Claude sees user's prompt
 - **Purpose**: Suggest relevant skills based on keywords + intent patterns
 - **Method**: Injects formatted reminder as context (stdout → Claude's input)
 - **Use Cases**: Topic-based skills, implicit work detection
 
 **2. Stop Hook - Error Handling Reminder** (Gentle Reminders)
-- **File**: `.claude/hooks/error-handling-reminder.ts`
+- **File**: `.claude/hooks/error-handling-reminder.py`
 - **Trigger**: AFTER Claude finishes responding
 - **Purpose**: Gentle reminder to self-assess error handling in code written
 - **Method**: Analyzes edited files for risky patterns, displays reminder if needed
@@ -73,8 +73,8 @@ Defines:
 - Session-aware (don't repeat nag in same session)
 
 **Examples:**
-- `database-verification` - Verify table/column names before Prisma queries
-- `frontend-dev-guidelines` - Enforce React/TypeScript patterns
+- `database-verification` - Verify table/column names before Supabase queries
+- `frontend-dev-guidelines` - Enforce Reflex patterns
 
 **When to Use:**
 - Mistakes that cause runtime errors
@@ -94,8 +94,8 @@ Defines:
 - Comprehensive documentation
 
 **Examples:**
-- `backend-dev-guidelines` - Node.js/Express/TypeScript patterns
-- `frontend-dev-guidelines` - React/TypeScript best practices
+- `backend-dev-guidelines` - Python 3.12/FastAPI patterns
+- `frontend-dev-guidelines` - Reflex best practices
 - `error-tracking` - Sentry integration guidance
 
 **When to Use:**
@@ -162,13 +162,13 @@ See [SKILL_RULES_REFERENCE.md](SKILL_RULES_REFERENCE.md) for complete schema.
 **Test UserPromptSubmit:**
 ```bash
 echo '{"session_id":"test","prompt":"your test prompt"}' | \
-  npx tsx .claude/hooks/skill-activation-prompt.ts
+  python .claude/hooks/skill-activation-prompt.py
 ```
 
 **Test PreToolUse:**
 ```bash
-cat <<'EOF' | npx tsx .claude/hooks/skill-verification-guard.ts
-{"session_id":"test","tool_name":"Edit","tool_input":{"file_path":"test.ts"}}
+cat <<'EOF' | python .claude/hooks/skill-verification-guard.py
+{"session_id":"test","tool_name":"Edit","tool_input":{"file_path":"test.py"}}
 EOF
 ```
 
@@ -238,13 +238,13 @@ Based on testing:
 
 **Purpose:** Permanent skip for verified files
 
-**Marker:** `// @skip-validation`
+**Marker:** `# @skip-validation`
 
 **Usage:**
-```typescript
-// @skip-validation
-import { PrismaService } from './prisma';
-// This file has been manually verified
+```python
+# @skip-validation
+from supabase import create_client
+# This file has been manually verified
 ```
 
 **NOTE:** Use sparingly - defeats the purpose if overused
@@ -305,7 +305,7 @@ Complete guide to all trigger types:
 
 ### [SKILL_RULES_REFERENCE.md](SKILL_RULES_REFERENCE.md)
 Complete skill-rules.json schema:
-- Full TypeScript interface definitions
+- Full Python type hint definitions
 - Field-by-field explanations
 - Complete guardrail skill example
 - Complete domain skill example
@@ -351,7 +351,7 @@ Future enhancements and ideas:
 
 1. Create `.claude/skills/{name}/SKILL.md` with frontmatter
 2. Add entry to `.claude/skills/skill-rules.json`
-3. Test with `npx tsx` commands
+3. Test with `python` or `uv run` commands
 4. Refine patterns based on testing
 5. Keep SKILL.md under 500 lines
 
@@ -373,7 +373,7 @@ See [TRIGGER_TYPES.md](TRIGGER_TYPES.md) for complete details.
 ### Skip Conditions
 
 - **Session tracking**: Automatic (prevents repeated nags)
-- **File markers**: `// @skip-validation` (permanent skip)
+- **File markers**: `# @skip-validation` (permanent skip)
 - **Env vars**: `SKIP_SKILL_GUARDRAILS` (emergency disable)
 
 ### Anthropic Best Practices
@@ -391,11 +391,11 @@ See [TRIGGER_TYPES.md](TRIGGER_TYPES.md) for complete details.
 Test hooks manually:
 ```bash
 # UserPromptSubmit
-echo '{"prompt":"test"}' | npx tsx .claude/hooks/skill-activation-prompt.ts
+echo '{"prompt":"test"}' | python .claude/hooks/skill-activation-prompt.py
 
 # PreToolUse
-cat <<'EOF' | npx tsx .claude/hooks/skill-verification-guard.ts
-{"tool_name":"Edit","tool_input":{"file_path":"test.ts"}}
+cat <<'EOF' | python .claude/hooks/skill-verification-guard.py
+{"tool_name":"Edit","tool_input":{"file_path":"test.py"}}
 EOF
 ```
 
@@ -411,8 +411,8 @@ See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for complete debugging guide.
 - `.claude/settings.json` - Hook registration
 
 **Hooks:**
-- `.claude/hooks/skill-activation-prompt.ts` - UserPromptSubmit
-- `.claude/hooks/error-handling-reminder.ts` - Stop event (gentle reminders)
+- `.claude/hooks/skill-activation-prompt.py` - UserPromptSubmit
+- `.claude/hooks/error-handling-reminder.py` - Stop event (gentle reminders)
 
 **All Skills:**
 - `.claude/skills/*/SKILL.md` - Skill content files

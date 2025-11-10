@@ -5,7 +5,7 @@ Complete schema and configuration reference for `.claude/skills/skill-rules.json
 ## Table of Contents
 
 - [File Location](#file-location)
-- [Complete TypeScript Schema](#complete-typescript-schema)
+- [Complete Python Type Hints Schema](#complete-python-type-hints-schema)
 - [Field Guide](#field-guide)
 - [Example: Guardrail Skill](#example-guardrail-skill)
 - [Example: Domain Skill](#example-domain-skill)
@@ -21,39 +21,38 @@ This JSON file defines all skills and their trigger conditions for the auto-acti
 
 ---
 
-## Complete TypeScript Schema
+## Complete Python Type Hints Schema
 
-```typescript
-interface SkillRules {
-    version: string;
-    skills: Record<string, SkillRule>;
-}
+```python
+from typing import TypedDict, Literal, Optional
 
-interface SkillRule {
-    type: 'guardrail' | 'domain';
-    enforcement: 'block' | 'suggest' | 'warn';
-    priority: 'critical' | 'high' | 'medium' | 'low';
+class PromptTriggers(TypedDict, total=False):
+    keywords: Optional[list[str]]
+    intentPatterns: Optional[list[str]]  # Regex strings
 
-    promptTriggers?: {
-        keywords?: string[];
-        intentPatterns?: string[];  // Regex strings
-    };
+class FileTriggers(TypedDict, total=False):
+    pathPatterns: list[str]  # Glob patterns
+    pathExclusions: Optional[list[str]]  # Glob patterns
+    contentPatterns: Optional[list[str]]  # Regex strings
+    createOnly: Optional[bool]  # Only trigger on file creation
 
-    fileTriggers?: {
-        pathPatterns: string[];     // Glob patterns
-        pathExclusions?: string[];  // Glob patterns
-        contentPatterns?: string[]; // Regex strings
-        createOnly?: boolean;       // Only trigger on file creation
-    };
+class SkipConditions(TypedDict, total=False):
+    sessionSkillUsed: Optional[bool]  # Skip if used in session
+    fileMarkers: Optional[list[str]]  # e.g., ["@skip-validation"]
+    envOverride: Optional[str]  # e.g., "SKIP_DB_VERIFICATION"
 
-    blockMessage?: string;  // For guardrails, {file_path} placeholder
+class SkillRule(TypedDict, total=False):
+    type: Literal["guardrail", "domain"]
+    enforcement: Literal["block", "suggest", "warn"]
+    priority: Literal["critical", "high", "medium", "low"]
+    promptTriggers: Optional[PromptTriggers]
+    fileTriggers: Optional[FileTriggers]
+    blockMessage: Optional[str]  # For guardrails, {file_path} placeholder
+    skipConditions: Optional[SkipConditions]
 
-    skipConditions?: {
-        sessionSkillUsed?: boolean;      // Skip if used in session
-        fileMarkers?: string[];          // e.g., ["@skip-validation"]
-        envOverride?: string;            // e.g., "SKIP_DB_VERIFICATION"
-    };
-}
+class SkillRules(TypedDict):
+    version: str
+    skills: dict[str, SkillRule]
 ```
 
 ---
@@ -122,7 +121,7 @@ Complete example of a blocking guardrail skill with all features:
 
     "promptTriggers": {
       "keywords": [
-        "prisma",
+        "supabase",
         "database",
         "table",
         "column",
@@ -139,37 +138,36 @@ Complete example of a blocking guardrail skill with all features:
 
     "fileTriggers": {
       "pathPatterns": [
-        "**/schema.prisma",
-        "**/migrations/**/*.sql",
-        "database/src/**/*.ts",
-        "form/src/**/*.ts",
-        "email/src/**/*.ts",
-        "users/src/**/*.ts",
-        "projects/src/**/*.ts",
-        "utilities/src/**/*.ts"
+        "**/supabase/migrations/**/*.sql",
+        "**/supabase/**/*.sql",
+        "database/src/**/*.py",
+        "form/src/**/*.py",
+        "email/src/**/*.py",
+        "users/src/**/*.py",
+        "projects/src/**/*.py",
+        "utilities/src/**/*.py"
       ],
       "pathExclusions": [
-        "**/*.test.ts",
-        "**/*.spec.ts"
+        "**/test_*.py",
+        "**/*_test.py",
+        "**/tests/**/*.py"
       ],
       "contentPatterns": [
-        "import.*[Pp]risma",
-        "PrismaService",
-        "prisma\\.",
-        "\\.findMany\\(",
-        "\\.findUnique\\(",
-        "\\.findFirst\\(",
-        "\\.create\\(",
-        "\\.createMany\\(",
+        "from supabase import",
+        "import supabase",
+        "create_client",
+        "supabase\\.",
+        "\\.table\\(",
+        "\\.select\\(",
+        "\\.insert\\(",
         "\\.update\\(",
-        "\\.updateMany\\(",
         "\\.upsert\\(",
         "\\.delete\\(",
-        "\\.deleteMany\\("
+        "\\.from_\\("
       ]
     },
 
-    "blockMessage": "⚠️ BLOCKED - Database Operation Detected\n\n📋 REQUIRED ACTION:\n1. Use Skill tool: 'database-verification'\n2. Verify ALL table and column names against schema\n3. Check database structure with DESCRIBE commands\n4. Then retry this edit\n\nReason: Prevent column name errors in Prisma queries\nFile: {file_path}\n\n💡 TIP: Add '// @skip-validation' comment to skip future checks",
+    "blockMessage": "⚠️ BLOCKED - Database Operation Detected\n\n📋 REQUIRED ACTION:\n1. Use Skill tool: 'database-verification'\n2. Verify ALL table and column names against schema\n3. Check database structure with DESCRIBE commands\n4. Then retry this edit\n\nReason: Prevent column name errors in Supabase queries\nFile: {file_path}\n\n💡 TIP: Add '# @skip-validation' comment to skip future checks",
 
     "skipConditions": {
       "sessionSkillUsed": true,
@@ -238,12 +236,15 @@ Complete example of a suggestion-based domain skill:
 
     "fileTriggers": {
       "pathPatterns": [
-        "frontend/src/features/submissions/**/*.tsx",
-        "frontend/src/features/submissions/**/*.ts"
+        "frontend/src/features/submissions/**/*.pyx",
+        "frontend/src/features/submissions/**/*.py"
       ],
       "pathExclusions": [
-        "**/*.test.tsx",
-        "**/*.test.ts"
+        "**/test_*.pyx",
+        "**/*_test.pyx",
+        "**/test_*.py",
+        "**/*_test.py",
+        "**/tests/**/*.py"
       ]
     }
   }

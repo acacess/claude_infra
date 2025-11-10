@@ -157,7 +157,7 @@ Ideas and concepts for future improvements to the skill system.
 
 ## Skill Testing Framework
 
-**Current State:** Manual testing with npx tsx commands
+**Current State:** Manual testing with python commands
 
 **Future Enhancement:** Automated skill testing
 
@@ -168,19 +168,18 @@ Ideas and concepts for future improvements to the skill system.
 - Coverage reports
 
 **Example Test:**
-```typescript
-describe('database-verification', () => {
-  it('triggers on Prisma imports', () => {
-    const result = testSkill({
-      prompt: "add user tracking",
-      file: "services/user.ts",
-      content: "import { PrismaService } from './prisma'"
-    });
+```python
+import pytest
 
-    expect(result.triggered).toBe(true);
-    expect(result.skill).toBe('database-verification');
-  });
-});
+def test_database_verification_triggers_on_supabase_imports():
+    result = test_skill(
+        prompt="add user tracking",
+        file="services/user.py",
+        content="from supabase import create_client"
+    )
+    
+    assert result.triggered is True
+    assert result.skill == "database-verification"
 ```
 
 **Benefits:**

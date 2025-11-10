@@ -19,13 +19,13 @@ Ready-to-use regex and glob patterns for skill triggers. Copy and customize for 
 ### Database Work
 ```regex
 (add|create|modify|update).*?(user|table|column|field|schema|migration)
-(database|prisma).*?(change|update|query)
+(database|supabase).*?(change|update|query)
 ```
 
 ### Error Handling
 ```regex
 (fix|handle|catch|debug).*?(error|exception|bug)
-(add|implement).*?(try|catch|error.*?handling)
+(add|implement).*?(try|except|error.*?handling)
 ```
 
 ### Explanation Requests
@@ -50,73 +50,76 @@ Ready-to-use regex and glob patterns for skill triggers. Copy and customize for 
 
 ### Frontend
 ```glob
-frontend/src/**/*.tsx        # All React components
-frontend/src/**/*.ts         # All TypeScript files
+frontend/src/**/*.pyx        # All Reflex components
+frontend/src/**/*.py         # All Python files
 frontend/src/components/**   # Only components directory
 ```
 
 ### Backend Services
 ```glob
-form/src/**/*.ts            # Form service
-email/src/**/*.ts           # Email service
-users/src/**/*.ts           # Users service
-projects/src/**/*.ts        # Projects service
+form/src/**/*.py            # Form service
+email/src/**/*.py           # Email service
+users/src/**/*.py           # Users service
+projects/src/**/*.py        # Projects service
 ```
 
 ### Database
 ```glob
-**/schema.prisma            # Prisma schema (anywhere)
-**/migrations/**/*.sql      # Migration files
-database/src/**/*.ts        # Database scripts
+**/supabase/migrations/**/*.sql      # Supabase migration files
+**/supabase/**/*.sql                 # Supabase SQL files
+database/src/**/*.py                  # Database scripts
 ```
 
 ### Workflows
 ```glob
-form/src/workflow/**/*.ts              # Workflow engine
+form/src/workflow/**/*.py              # Workflow engine
 form/src/workflow-definitions/**/*.json # Workflow definitions
 ```
 
 ### Test Exclusions
 ```glob
-**/*.test.ts                # TypeScript tests
-**/*.test.tsx               # React component tests
-**/*.spec.ts                # Spec files
+**/test_*.py                # Python tests (test_*.py)
+**/*_test.py               # Python tests (*_test.py)
+**/tests/**/*.py           # Tests directory
 ```
 
 ---
 
 ## Content Patterns (Regex)
 
-### Prisma/Database
+### Supabase/Database
 ```regex
-import.*[Pp]risma                # Prisma imports
-PrismaService                    # PrismaService usage
-prisma\.                         # prisma.something
-\.findMany\(                     # Prisma query methods
-\.create\(
+from supabase import             # Supabase imports
+import supabase                  # Supabase imports (alternative)
+create_client                    # Supabase client creation
+supabase\.                       # supabase.something
+\.table\(                        # Supabase query methods
+\.select\(
+\.insert\(
 \.update\(
 \.delete\(
+\.from_\(
 ```
 
-### Controllers/Routes
+### FastAPI Routes
 ```regex
-export class.*Controller         # Controller classes
-router\.                         # Express router
-app\.(get|post|put|delete|patch) # Express app routes
+@app\.(get|post|put|delete|patch) # FastAPI route decorators
+from fastapi import              # FastAPI imports
+APIRouter                        # FastAPI router
 ```
 
 ### Error Handling
 ```regex
-try\s*\{                        # Try blocks
-catch\s*\(                      # Catch blocks
-throw new                        # Throw statements
+try\s*:                          # Try blocks
+except\s*:                       # Except blocks
+raise\s+                         # Raise statements
 ```
 
-### React/Components
+### Reflex/Components
 ```regex
-export.*React\.FC               # React functional components
-export default function.*       # Default function exports
-useState|useEffect              # React hooks
+import reflex as rx              # Reflex imports
+rx\.                             # Reflex component usage
+def\s+\w+\(\)\s*->\s*rx\.       # Reflex component functions
 ```
 
 ---
@@ -133,11 +136,11 @@ useState|useEffect              # React hooks
     },
     "fileTriggers": {
       "pathPatterns": [
-        "frontend/src/**/*.tsx"
+        "frontend/src/**/*.pyx"
       ],
       "contentPatterns": [
-        "export.*React\\.FC",
-        "useState|useEffect"
+        "import reflex as rx",
+        "rx\\."
       ]
     }
   }
