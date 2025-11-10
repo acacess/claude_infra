@@ -30,6 +30,7 @@ Automatically activates when working on:
 Creating a Reflex page? Follow this checklist:
 
 - [ ] Use `@rx.page()` decorator with route and title
+- [ ] Consume backend data through typed client helpers (never raw dicts)
 - [ ] Create corresponding State class if needed
 - [ ] Use `rx.*` components for UI
 - [ ] Type hints on all State properties and methods
@@ -37,6 +38,7 @@ Creating a Reflex page? Follow this checklist:
 - [ ] Use Reflex styling system (style dicts or Tailwind)
 - [ ] Implement error handling for API calls
 - [ ] Add loading states for async operations
+- [ ] Capture and report errors via shared Sentry helper
 
 ### New Feature Checklist
 
@@ -46,9 +48,11 @@ Creating a feature? Set up this structure:
 - [ ] Create subdirectories: `states/`, `components/`, `api/`, `utils/`
 - [ ] Create State class in `states/{feature}_state.py`
 - [ ] Create components in `components/`
-- [ ] Create API client in `api/{feature}_api.py`
+- [ ] Create typed API client in `api/{feature}_api.py` using shared schemas
 - [ ] Export public API from feature `__init__.py`
 - [ ] Add routes to main app
+- [ ] Wire feature config (API base URL, Supabase keys) through centralized settings
+- [ ] Add component/state tests (unit + e2e) that exercise FastAPI endpoints
 
 ---
 
@@ -257,6 +261,107 @@ components/
   post_card.py
   user_card.py
 ```
+
+### 9. Typed API Clients Mirror Backend Schemas
+
+```python
+from typing import Annotated
+import httpx
+from pydantic import BaseModel
+
+from app.config import settings
+
+class PostResponse(BaseModel):
+    id: int
+    title: str
+    body: str
+
+_client = httpx.AsyncClient(base_url=settings.api_base_url, timeout=settings.api_timeout)
+
+async def fetch_posts() -> list[PostResponse]:
+    """Call FastAPI backend using shared schema."""
+    response = await _client.get("/posts", headers=settings.auth_headers())
+    response.raise_for_status()
+    return [PostResponse.model_validate(obj) for obj in response.json()]
+```
+
+**Why:** Backend guideline mandates Pydantic validation on both sides. Keep request/response models in sync (ideally shared package or generated client) so regressions surface early.
+
+---
+
+## Shared Configuration & Environment Handling
+
+- Create a single `app/config.py` (or `features/config.py`) that loads environment values via `pydantic-settings`, matching backend practice. Import this config everywhere instead of `os.getenv`.
+- Standard fields: `api_base_url`, `supabase_project_url`, `supabase_public_key`, `api_timeout_ms`, `sentry_dsn`, feature flags.
+- Provide helper methods like `auth_headers()` to add Supabase access tokens/JWTs automatically, so components/states never duplicate header logic.
+- Support per-environment overrides (local/dev/staging/prod) that mirror backend `settings.env`.
+
+```python
+from pydantic_settings import BaseSettings
+
+class FrontendSettings(BaseSettings):
+    api_base_url: str
+    api_timeout: float = 10.0
+    sentry_dsn: str | None = None
+    supabase_url: str
+    supabase_anon_key: str
+
+settings = FrontendSettings()  # automatically reads env vars / .env files
+```
+
+---
+
+## Observability & Error Handling
+
+- Initialize Sentry (or equivalent) in Reflex startup code using the same DSN/project as FastAPI so traces can be linked.
+- Wrap async state methods that call the backend in `try/except`, call `sentry_sdk.capture_exception(err)`, set human-friendly error state, and show a toast/banner in the UI.
+- For API clients, centralize response handling so HTTP status mapping (200/201/400/401/etc.) mirrors backend `status` constants; bubble validation errors back to form states.
+- Use structured logging (Python `logging` module) for local debugging; avoid `print`.
+
+```python
+import sentry_sdk
+from sentry_sdk.integrations.asyncio import AsyncioIntegration
+
+sentry_sdk.init(
+    dsn=settings.sentry_dsn,
+    integrations=[AsyncioIntegration()],
+    traces_sample_rate=1.0,
+)
+```
+
+---
+
+## Authentication & Security Alignment
+
+- Store auth tokens in Reflex state (never localStorage). Example: `AuthState` keeps `access_token`, `refresh_token`, and derived `current_user`.
+- `AuthState` should expose helpers (`auth_headers`) consumed by every API client; tokens come from Supabase auth responses or FastAPI login endpoints.
+- Refresh tokens proactively before expiration—call the backend refresh route from a background task and update state atomically.
+- Mirror backend middleware expectations: include CSRF headers if required, send Supabase session info when using Row Level Security, and clear state on 401 responses.
+
+```python
+class AuthState(rx.State):
+    access_token: str | None = None
+    refresh_token: str | None = None
+
+    async def login(self, credentials: LoginRequest) -> None:
+        try:
+            tokens = await auth_api.login(credentials)
+        except httpx.HTTPStatusError as err:
+            sentry_sdk.capture_exception(err)
+            self.error = "Login failed"
+            return
+        self.access_token = tokens.access_token
+        self.refresh_token = tokens.refresh_token
+```
+
+---
+
+## Testing Strategy
+
+- **Unit tests:** Use `pytest` + `reflex.testing` utilities to exercise component functions and state methods. Mock API clients to verify that state transitions follow backend contracts.
+- **Integration tests:** Run Playwright/Cypress e2e flows against a FastAPI instance seeded with Supabase data. Cover auth, CRUD flows, and error scenarios.
+- **Contract tests:** When backend schemas change, regenerate shared Pydantic models or client code and run snapshot tests to ensure the frontend still parses responses correctly.
+- Add a short checklist per feature (`tests/{feature}_test.py`) verifying pages render, loading/error states flip, and Sentry gets called on failures.
 
 ---
 
