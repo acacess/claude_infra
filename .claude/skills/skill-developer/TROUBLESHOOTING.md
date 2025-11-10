@@ -129,12 +129,12 @@ Expected: Your skill should appear in the output.
 **Example:**
 ```json
 "pathPatterns": [
-  "frontend/src/**/*.pyx"
+  "app/features/**/*.py"
 ]
 ```
-- Editing: `frontend/src/components/Dashboard.pyx` → ✅ Matches
-- Editing: `frontend/tests/test_dashboard.pyx` → ✅ Matches (add exclusion!)
-- Editing: `backend/src/app.py` → ❌ Doesn't match
+- Editing: `app/features/dashboard/components/card.py` → ✅ Matches
+- Editing: `app/features/tests/test_dashboard.py` → ✅ Matches (add exclusion!)
+- Editing: `app/services/user_service.py` → ❌ Doesn't match (needs backend pattern)
 
 **Fix:** Adjust glob patterns or add the missing path
 
@@ -239,7 +239,7 @@ cat <<'EOF' | python .claude/hooks/skill-verification-guard.py 2>&1
 {
   "session_id": "debug",
   "tool_name": "Edit",
-  "tool_input": {"file_path": "/root/git/your-project/form/src/services/user.py"}
+  "tool_input": {"file_path": "/root/git/your-project/app/services/user.py"}
 }
 EOF
 echo "Exit code: $?"
@@ -301,7 +301,7 @@ Expected:
 **Problem:**
 ```json
 "pathPatterns": [
-  "form/**"  # Matches everything in form/
+  "app/**"  # Matches everything in app/
 ]
 ```
 - Triggers on: test files, config files, everything
@@ -309,8 +309,8 @@ Expected:
 **Solution:** Use narrower patterns
 ```json
 "pathPatterns": [
-  "form/src/services/**/*.py",  # Only service files
-  "form/src/controllers/**/*.py"
+  "app/services/**/*.py",       # Only service files
+  "app/routers/**/*.py"
 ]
 ```
 
@@ -487,8 +487,8 @@ mypy skill-activation-prompt.py
 **Solution:** Be more specific
 ```json
 "pathPatterns": [
-  "form/src/services/**/*.py",  # Only specific directory
-  "form/src/controllers/**/*.py"
+  "app/services/**/*.py",       # Only service layer
+  "app/routers/**/*.py"
 ]
 ```
 

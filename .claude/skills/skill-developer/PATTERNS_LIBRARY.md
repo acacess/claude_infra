@@ -50,30 +50,30 @@ Ready-to-use regex and glob patterns for skill triggers. Copy and customize for 
 
 ### Frontend
 ```glob
-frontend/src/**/*.pyx        # All Reflex components
-frontend/src/**/*.py         # All Python files
-frontend/src/components/**   # Only components directory
+app/pages/**/*.py            # Reflex pages
+app/features/**/*.py         # Feature modules (states + components)
+app/components/**/*.py       # Shared components
 ```
 
 ### Backend Services
 ```glob
-form/src/**/*.py            # Form service
-email/src/**/*.py           # Email service
-users/src/**/*.py           # Users service
-projects/src/**/*.py        # Projects service
+app/routers/**/*.py          # FastAPI routers
+app/services/**/*.py         # Business logic
+app/repositories/**/*.py     # Database access layer
+app/schemas/**/*.py          # Pydantic models
 ```
 
 ### Database
 ```glob
-**/supabase/migrations/**/*.sql      # Supabase migration files
-**/supabase/**/*.sql                 # Supabase SQL files
-database/src/**/*.py                  # Database scripts
+supabase/migrations/**/*.sql      # Supabase migration files
+alembic/versions/**/*.py          # Alembic revision scripts
+app/db/**/*.py                    # Database helpers
 ```
 
 ### Workflows
 ```glob
-form/src/workflow/**/*.py              # Workflow engine
-form/src/workflow-definitions/**/*.json # Workflow definitions
+app/workflows/**/*.py              # Workflow orchestration
+app/workflow_definitions/**/*.json # Workflow definitions
 ```
 
 ### Test Exclusions
@@ -136,7 +136,7 @@ def\s+\w+\(\)\s*->\s*rx\.       # Reflex component functions
     },
     "fileTriggers": {
       "pathPatterns": [
-        "frontend/src/**/*.pyx"
+        "app/features/**/*.py"
       ],
       "contentPatterns": [
         "import reflex as rx",

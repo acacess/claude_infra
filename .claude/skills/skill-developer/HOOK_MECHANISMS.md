@@ -139,7 +139,7 @@ IF ALLOWED:
   "hook_event_name": "PreToolUse",
   "tool_name": "Edit",
   "tool_input": {
-    "file_path": "/root/git/your-project/form/src/services/user.py",
+    "file_path": "/root/git/your-project/app/services/user.py",
     "old_string": "...",
     "new_string": "..."
   }
@@ -158,7 +158,7 @@ IF ALLOWED:
 4. Then retry this edit
 
 Reason: Prevent column name errors in Supabase queries
-File: form/src/services/user.py
+File: app/services/user.py
 
 💡 TIP: Add '# @skip-validation' comment to skip future checks
 ```
@@ -194,7 +194,7 @@ This is THE critical mechanism for enforcement:
 User: "Add a new user service with Supabase"
 
 Claude: "I'll create the user service..."
-    [Attempts to Edit form/src/services/user.py]
+    [Attempts to Edit app/services/user.py]
 
 PreToolUse Hook: [Exit code 2]
     stderr: "⚠️ BLOCKED - Use database-verification"
@@ -292,7 +292,7 @@ The hook cannot detect when the skill is *actually* invoked - it just blocks onc
 
 **File path patterns:**
 - More specific = fewer files to check
-- Example: `form/src/services/**` better than `form/**`
+  - Example: `app/services/**` better than `app/**`
 
 **Content patterns:**
 - Only add when truly necessary

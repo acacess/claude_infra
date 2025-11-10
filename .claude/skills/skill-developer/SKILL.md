@@ -221,6 +221,30 @@ Based on testing:
 
 ---
 
+## Stack Alignment (Python 3.12 + FastAPI + Supabase + Reflex)
+
+Design guardrails so they map directly onto the core services in this repo:
+
+- **FastAPI backend**
+  - Path patterns: `app/routers/**/*.py`, `app/services/**/*.py`, `app/repositories/**/*.py`
+  - Content patterns: `@router\.(get|post|put|delete)`, `Depends`, `AsyncSession`
+  - Enforce: DTO validation, dependency injection, error handling, Sentry capture
+- **Supabase/PostgreSQL layer**
+  - Path patterns: `supabase/migrations/**/*.sql`, `app/db/**/*.py`, `alembic/**/*.py`
+  - Content patterns: `from supabase import`, `sqlalchemy`, `.table(`
+  - Enforce: schema verification, migration ordering, row-level security considerations
+- **Reflex frontend**
+  - Path patterns: `app/features/**/*.py`, `app/pages/**/*.py`, `app/components/**/*.py`
+  - Content patterns: `import reflex as rx`, `rx.`, `class .*State\(rx.State`
+  - Enforce: typed State classes, async handlers, feature-based organization, alignment with backend APIs
+- **Shared configuration**
+  - Watch `app/config.py`, `.env*`, and settings modules to ensure Pydantic settings drive both frontend and backend
+  - Guardrails should reject ad-hoc `os.getenv` usage and require centralized config helpers
+
+Use these patterns as defaults when adding new skills so every change in the Python stack triggers the right guidance automatically.
+
+---
+
 ## Skip Conditions & User Control
 
 ### 1. Session Tracking

@@ -123,13 +123,13 @@ Domain/area-specific activation based on file location in the project.
 ```json
 "fileTriggers": {
   "pathPatterns": [
-    "frontend/src/**/*.pyx",
-    "form/src/**/*.py"
+    "app/features/**/*.py",
+    "app/routers/**/*.py"
   ],
   "pathExclusions": [
+    "**/tests/**/*.py",
     "**/test_*.py",
-    "**/*_test.py",
-    "**/tests/**/*.py"
+    "**/*_test.py"
   ]
 }
 ```
@@ -139,14 +139,14 @@ Domain/area-specific activation based on file location in the project.
 - `**` = Any number of directories (including zero)
 - `*` = Any characters within a directory name
 - Examples:
-  - `frontend/src/**/*.pyx` = All .pyx files in frontend/src and subdirs
+  - `app/features/**/*.py` = All Reflex feature modules
   - `**/supabase/migrations/**/*.sql` = Supabase migration files anywhere in project
-  - `form/src/**/*.py` = All .py files in form/src subdirs
+  - `app/routers/**/*.py` = All FastAPI router modules
 
 ### Example
 
-- File being edited: `frontend/src/components/Dashboard.pyx`
-- Matches: `frontend/src/**/*.pyx`
+- File being edited: `app/features/dashboard/components/card.py`
+- Matches: `app/features/**/*.py`
 - Activates: `frontend-dev-guidelines`
 
 ### Best Practices
@@ -155,34 +155,34 @@ Domain/area-specific activation based on file location in the project.
 - Use exclusions for test files: `**/test_*.py` or `**/*_test.py`
 - Consider subdirectory structure
 - Test patterns with actual file paths
-- Use narrower patterns when possible: `form/src/services/**` not `form/**`
+- Use narrower patterns when possible: `app/services/**` not `app/**`
 
 ### Common Path Patterns
 
 ```glob
-# Frontend
-frontend/src/**/*.pyx        # All Reflex components
-frontend/src/**/*.py         # All Python files
-frontend/src/components/**   # Only components directory
+# Reflex Frontend
+app/pages/**/*.py             # Page modules decorated with @rx.page
+app/features/**/*.py          # Feature state/components
+app/components/**/*.py        # Shared components
 
-# Backend Services
-form/src/**/*.py            # Form service
-email/src/**/*.py           # Email service
-users/src/**/*.py           # Users service
+# FastAPI Backend
+app/routers/**/*.py           # APIRouter definitions
+app/services/**/*.py          # Business logic layer
+app/repositories/**/*.py      # Database access layer
 
-# Database
-**/supabase/migrations/**/*.sql      # Supabase migration files
-**/supabase/**/*.sql                 # Supabase SQL files
-database/src/**/*.py                  # Database scripts
+# Supabase / Database
+supabase/migrations/**/*.sql  # SQL migrations
+alembic/versions/**/*.py      # Alembic migrations
+app/db/**/*.py                # Database utilities
 
-# Workflows
-form/src/workflow/**/*.py              # Workflow engine
-form/src/workflow-definitions/**/*.json # Workflow definitions
+# Workflow / Utilities
+app/workflows/**/*.py
+scripts/**/*.py
 
 # Test Exclusions
-**/test_*.py                # Python tests (test_*.py)
-**/*_test.py               # Python tests (*_test.py)
-**/tests/**/*.py           # Tests directory
+**/tests/**/*.py
+**/test_*.py
+**/*_test.py
 ```
 
 ---

@@ -138,14 +138,13 @@ Complete example of a blocking guardrail skill with all features:
 
     "fileTriggers": {
       "pathPatterns": [
-        "**/supabase/migrations/**/*.sql",
-        "**/supabase/**/*.sql",
-        "database/src/**/*.py",
-        "form/src/**/*.py",
-        "email/src/**/*.py",
-        "users/src/**/*.py",
-        "projects/src/**/*.py",
-        "utilities/src/**/*.py"
+        "supabase/migrations/**/*.sql",
+        "supabase/**/*.sql",
+        "app/db/**/*.py",
+        "app/services/**/*.py",
+        "app/repositories/**/*.py",
+        "app/routers/**/*.py",
+        "scripts/**/*.py"
       ],
       "pathExclusions": [
         "**/test_*.py",
@@ -236,15 +235,13 @@ Complete example of a suggestion-based domain skill:
 
     "fileTriggers": {
       "pathPatterns": [
-        "frontend/src/features/submissions/**/*.pyx",
-        "frontend/src/features/submissions/**/*.py"
+        "app/features/submissions/**/*.py",
+        "app/pages/submissions/**/*.py"
       ],
       "pathExclusions": [
-        "**/test_*.pyx",
-        "**/*_test.pyx",
+        "**/tests/**/*.py",
         "**/test_*.py",
-        "**/*_test.py",
-        "**/tests/**/*.py"
+        "**/*_test.py"
       ]
     }
   }
