@@ -122,23 +122,20 @@ async def delete_user(
 
 ```python
 # app/dependencies/database.py
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import AsyncSessionLocal
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     """
-    Provide database session.
+    Provide a database session per request.
 
-    Automatically commits on success, rolls back on error.
+    Transaction boundaries are handled by the calling
+    service layer so we only manage lifecycle/cleanup here.
     """
     async with AsyncSessionLocal() as session:
         try:
             yield session
-            await session.commit()
-        except Exception:
-            await session.rollback()
-            raise
         finally:
             await session.close()
 ```

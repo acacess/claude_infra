@@ -62,12 +62,10 @@ Each layer has EXACTLY ONE job:
 @router.post("/users/", status_code=status.HTTP_201_CREATED)
 async def create_user(
     user_data: UserCreate,  # Pydantic validation
-    db: AsyncSession = Depends(get_db),  # DB dependency
-    current_user: User = Depends(get_current_active_user)  # Auth
+    current_user: User = Depends(get_current_active_user),
+    service: UserService = Depends(get_user_service),
 ) -> UserResponse:
     """Create a new user (admin only)."""
-    # Just delegate to service
-    service = UserService(db)
     return await service.create_user(user_data, current_user)
 
 
@@ -83,29 +81,39 @@ class UserService:
         created_by: User
     ) -> User:
         """Business logic for user creation."""
-        # Check if email exists
-        existing = await self.repo.get_by_email(user_data.email)
-        if existing:
-            raise HTTPException(
-                status_code=400,
-                detail="Email already registered"
+        try:
+            # Check if email exists
+            existing = await self.repo.get_by_email(user_data.email)
+            if existing:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Email already registered"
+                )
+
+            # Hash password
+            hashed_password = get_password_hash(user_data.password)
+
+            # Create user via repository
+            user = await self.repo.create(
+                email=user_data.email,
+                username=user_data.username,
+                hashed_password=hashed_password,
+                created_by_id=created_by.id
             )
 
-        # Hash password
-        hashed_password = get_password_hash(user_data.password)
+            # Send welcome email (example of orchestration)
+            await send_welcome_email(user.email)
 
-        # Create user via repository
-        user = await self.repo.create(
-            email=user_data.email,
-            username=user_data.username,
-            hashed_password=hashed_password,
-            created_by_id=created_by.id
-        )
+            await self.db.commit()
+            await self.db.refresh(user)
+            return user
 
-        # Send welcome email (example of orchestration)
-        await send_welcome_email(user.email)
-
-        return user
+        except HTTPException:
+            await self.db.rollback()
+            raise
+        except Exception:
+            await self.db.rollback()
+            raise
 
 
 # 3. REPOSITORY LAYER - app/repositories/user_repository.py
@@ -135,8 +143,7 @@ class UserRepository:
             created_by_id=created_by_id
         )
         self.db.add(user)
-        await self.db.commit()
-        await self.db.refresh(user)
+        await self.db.flush()
         return user
 ```
 

@@ -388,20 +388,41 @@ async def create_user(
 
 ## Transaction Management
 
-### Automatic Commit/Rollback
+### Service-Managed Transactions (Recommended)
 
 ```python
-# Database dependency with automatic transaction handling
+from collections.abc import AsyncGenerator
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
+
+# app/core/database.py
+AsyncSessionLocal = async_sessionmaker(engine, expire_on_commit=False)
+
+# app/dependencies/database.py
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     async with AsyncSessionLocal() as session:
+        yield session
+
+# Service layer
+class ComplexService:
+    def __init__(self, db: AsyncSession):
+        self.db = db
+
+    async def create_resource(self, data: ResourceCreate) -> ResourceResponse:
         try:
-            yield session
-            await session.commit()  # Auto-commit on success
-        except Exception:
-            await session.rollback()  # Auto-rollback on error
+            entity = await self.repo.create(data)
+            await self.db.commit()
+            await self.db.refresh(entity)
+            return ResourceResponse.model_validate(entity)
+        except HTTPException:
+            await self.db.rollback()
             raise
-        finally:
-            await session.close()
+        except Exception as exc:
+            await self.db.rollback()
+            sentry_sdk.capture_exception(exc)
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to create resource"
+            )
 ```
 
 ### Manual Transaction Control
