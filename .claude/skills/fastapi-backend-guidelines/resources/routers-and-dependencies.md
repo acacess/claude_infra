@@ -224,6 +224,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.dependencies.database import get_db
 from app.services.user_service import UserService
 from app.services.post_service import PostService
+from app.services.auth_service import AuthService
 
 def get_user_service(db: AsyncSession = Depends(get_db)) -> UserService:
     """Provide UserService instance."""
@@ -232,6 +233,10 @@ def get_user_service(db: AsyncSession = Depends(get_db)) -> UserService:
 def get_post_service(db: AsyncSession = Depends(get_db)) -> PostService:
     """Provide PostService instance."""
     return PostService(db)
+
+def get_auth_service(db: AsyncSession = Depends(get_db)) -> AuthService:
+    """Provide AuthService instance."""
+    return AuthService(db)
 ```
 
 ### Dependency Chains

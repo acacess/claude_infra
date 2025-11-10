@@ -29,7 +29,7 @@ Complete guide to Reflex architecture and how state synchronization works.
 │    FastAPI Backend (API Server)      │
 │  - REST API endpoints                │
 │  - Business logic                    │
-│  - Database access (SQLAlchemy)      │
+│  - Database access (Supabase/SQLAlchemy) │
 │  - Authentication (JWT)              │
 └─────────────────────────────────────┘
 ```

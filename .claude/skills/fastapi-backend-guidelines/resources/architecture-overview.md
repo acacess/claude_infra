@@ -38,7 +38,7 @@ Complete guide to layered architecture for FastAPI microservices.
 └─────────────────┬───────────────────────┘
                   │
 ┌─────────────────▼───────────────────────┐
-│         Database (PostgreSQL)            │
+│         Database (Supabase/PostgreSQL)   │
 └─────────────────────────────────────────┘
 ```
 

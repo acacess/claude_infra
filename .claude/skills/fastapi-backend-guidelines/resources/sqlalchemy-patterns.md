@@ -1,6 +1,8 @@
 # SQLAlchemy Patterns - Async Database Access
 
-Complete guide to SQLAlchemy 2.0 async patterns for FastAPI.
+Complete guide to SQLAlchemy 2.0 async patterns for FastAPI with Supabase (PostgreSQL).
+
+**Note**: This stack uses **Supabase** as the database platform. Supabase is built on PostgreSQL, so all SQLAlchemy patterns work seamlessly. Supabase also provides additional features like built-in auth, storage, and realtime subscriptions that can be used alongside SQLAlchemy.
 
 ## Database Setup
 

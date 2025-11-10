@@ -45,10 +45,19 @@ settings = get_settings()
 ```bash
 APP_NAME="My FastAPI App"
 DEBUG=true
-DATABASE_URL="postgresql+asyncpg://user:pass@localhost/db"
+
+# Supabase Database Connection
+# Format: postgresql+asyncpg://postgres:[PASSWORD]@[PROJECT_REF].supabase.co:5432/postgres
+DATABASE_URL="postgresql+asyncpg://postgres:your-password@your-project-ref.supabase.co:5432/postgres"
+
+# For local development (optional)
+# DATABASE_URL="postgresql+asyncpg://user:pass@localhost/db"
+
 SECRET_KEY="your-secret-key-here"
 SENTRY_DSN="https://sentry.io/xxx"
 ```
+
+**Note**: This stack uses **Supabase** (PostgreSQL) as the database. Supabase provides additional features like built-in auth, storage, and realtime subscriptions, but you can still use SQLAlchemy for database access.
 
 ## Usage in Application
 

@@ -208,12 +208,13 @@ cat $CLAUDE_PROJECT_DIR/.claude/skills/skill-rules.json | jq .
 ### Skill-Specific Notes
 
 #### fastapi-backend-guidelines (Python/FastAPI)
-- **Tech Requirements:** Python 3.12+, FastAPI, PostgreSQL, SQLAlchemy (async), Sentry
-- **Ask:** "Do you use FastAPI with SQLAlchemy?" "Where's your backend code?"
+- **Tech Requirements:** Python 3.12+, FastAPI, Supabase (PostgreSQL), SQLAlchemy (async), Sentry
+- **Ask:** "Do you use FastAPI with Supabase?" "Where's your backend code?"
 - **If different stack:** Offer to adapt using this as template
 - **Customize:** pathPatterns
 - **Example paths:** `backend/`, `api/`, `app/`, `services/*/app/`
 - **Adaptation tip:** Architecture patterns (Routers→Dependencies→Services→Repositories) transfer to most Python frameworks
+- **Note:** This stack uses **Supabase** as the database platform (PostgreSQL with Supabase features)
 
 #### backend-dev-guidelines (Node.js/Express)
 - **Tech Requirements:** Node.js, Express, TypeScript, Prisma ORM, Sentry
@@ -230,6 +231,7 @@ cat $CLAUDE_PROJECT_DIR/.claude/skills/skill-rules.json | jq .
 - **Customize:** pathPatterns + all framework-specific examples
 - **Example paths:** `frontend/`, `web/`, `app/`, `reflex/`
 - **Adaptation tip:** State management and file organization patterns may transfer to similar Python web frameworks
+- **Note:** This frontend is designed to work with **FastAPI + Supabase backend** (see `fastapi-backend-guidelines`). Tech stack: **FastAPI + Supabase + Reflex**.
 
 #### frontend-dev-guidelines (React/TypeScript)
 - **Tech Requirements:** React, TypeScript, MUI v7, TanStack Query/Router

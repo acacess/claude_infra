@@ -608,6 +608,180 @@ async def test_daily_post_limit(
 
 ---
 
+## Authentication Flow
+
+### 1. Auth Schemas
+
+```python
+# app/schemas/auth.py
+from pydantic import BaseModel, EmailStr
+
+class LoginRequest(BaseModel):
+    """Login request schema."""
+    email: EmailStr
+    password: str
+
+class TokenResponse(BaseModel):
+    """Token response schema."""
+    access_token: str
+    refresh_token: str
+    token_type: str = "bearer"
+
+class LoginResponse(TokenResponse):
+    """Login response schema."""
+    user: dict  # UserResponse as dict
+```
+
+### 2. Auth Service
+
+```python
+# app/services/auth_service.py
+from datetime import datetime, timedelta
+from jose import jwt
+from passlib.context import CryptContext
+from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import HTTPException, status
+import sentry_sdk
+
+from app.repositories.user_repository import UserRepository
+from app.schemas.auth import LoginRequest, LoginResponse
+from app.core.config import settings
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+class AuthService:
+    """Service for authentication logic."""
+
+    def __init__(self, db: AsyncSession):
+        self.db = db
+        self.user_repo = UserRepository(db)
+
+    def verify_password(self, plain_password: str, hashed_password: str) -> bool:
+        """Verify password against hash."""
+        return pwd_context.verify(plain_password, hashed_password)
+
+    def create_access_token(self, user_id: int) -> str:
+        """Create JWT access token."""
+        expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+        to_encode = {"sub": str(user_id), "exp": expire}
+        return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+
+    def create_refresh_token(self, user_id: int) -> str:
+        """Create JWT refresh token."""
+        expire = datetime.utcnow() + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
+        to_encode = {"sub": str(user_id), "exp": expire, "type": "refresh"}
+        return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+
+    async def login(self, login_data: LoginRequest) -> LoginResponse:
+        """
+        Authenticate user and return tokens.
+
+        Business rules:
+        - User must exist
+        - Password must be correct
+        - User must be active
+        """
+        try:
+            # Get user by email
+            user = await self.user_repo.get_by_email(login_data.email)
+            if not user:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Invalid email or password"
+                )
+
+            # Verify password
+            if not self.verify_password(login_data.password, user.hashed_password):
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Invalid email or password"
+                )
+
+            # Check if user is active
+            if not user.is_active:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="User account is inactive"
+                )
+
+            # Create tokens
+            access_token = self.create_access_token(user.id)
+            refresh_token = self.create_refresh_token(user.id)
+
+            # Return response with user data
+            return LoginResponse(
+                access_token=access_token,
+                refresh_token=refresh_token,
+                user={
+                    "id": user.id,
+                    "email": user.email,
+                    "username": user.username,
+                    "is_active": user.is_active,
+                    "is_admin": user.is_admin
+                }
+            )
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            sentry_sdk.capture_exception(e)
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Authentication failed"
+            )
+```
+
+### 3. Auth Router
+
+```python
+# app/routers/auth_router.py
+from fastapi import APIRouter, Depends, status
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.dependencies.database import get_db
+from app.dependencies.services import get_auth_service
+from app.schemas.auth import LoginRequest, LoginResponse
+from app.services.auth_service import AuthService
+
+router = APIRouter(
+    prefix="/auth",
+    tags=["auth"]
+)
+
+def get_auth_service(db: AsyncSession = Depends(get_db)) -> AuthService:
+    """Dependency to get AuthService instance."""
+    return AuthService(db)
+
+@router.post(
+    "/login",
+    response_model=LoginResponse,
+    status_code=status.HTTP_200_OK
+)
+async def login(
+    login_data: LoginRequest,
+    service: AuthService = Depends(get_auth_service)
+) -> LoginResponse:
+    """
+    Authenticate user and return access/refresh tokens.
+
+    Returns:
+    - access_token: JWT token for API authentication
+    - refresh_token: JWT token for refreshing access token
+    - user: User information (id, email, username, etc.)
+    """
+    return await service.login(login_data)
+```
+
+**Note**: This matches the frontend expectation in `reflex-frontend-guidelines` which expects:
+```python
+data = response.json()
+self.access_token = data["access_token"]
+self.refresh_token = data["refresh_token"]
+self.user = data["user"]
+```
+
+---
+
 ## Key Takeaways
 
 This complete example demonstrates:

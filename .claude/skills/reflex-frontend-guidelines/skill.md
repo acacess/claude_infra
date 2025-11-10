@@ -383,9 +383,11 @@ Full working examples, end-to-end implementations
 
 ## Related Skills
 
-- **fastapi-backend-guidelines** - Backend APIs that Reflex frontend consumes
+- **fastapi-backend-guidelines** - Backend APIs that Reflex frontend consumes (FastAPI + Supabase)
 - **error-tracking** - Sentry integration (works in Reflex too)
 - **skill-developer** - Meta-skill for creating and managing skills
+
+**Note**: This frontend is designed to work with **FastAPI + Supabase backend** (see `fastapi-backend-guidelines`). The API endpoints, request/response formats, and authentication patterns are aligned between both skill sets. Tech stack: **FastAPI + Supabase + Reflex**.
 
 ---
 

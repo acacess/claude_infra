@@ -223,7 +223,7 @@
             "type": "domain",
             "enforcement": "suggest",
             "priority": "high",
-            "description": "Backend development patterns for Python/FastAPI/SQLAlchemy",
+            "description": "Backend development patterns for Python/FastAPI/Supabase/SQLAlchemy",
             "promptTriggers": {
                 "keywords": [
                     "backend",

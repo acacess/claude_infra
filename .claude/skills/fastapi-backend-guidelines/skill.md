@@ -1,13 +1,15 @@
 ---
 name: fastapi-backend-guidelines
-description: Comprehensive backend development guide for Python 3.12/FastAPI/SQLAlchemy microservices. Use when creating routes, dependencies, services, repositories, middleware, or working with FastAPI APIs, SQLAlchemy database access, Sentry error tracking, Pydantic validation, async patterns, and dependency injection. Covers layered architecture (routers → dependencies → services → repositories), error handling, performance monitoring, testing strategies, and best practices.
+description: Comprehensive backend development guide for Python 3.12/FastAPI/Supabase/SQLAlchemy microservices. Use when creating routes, dependencies, services, repositories, middleware, or working with FastAPI APIs, Supabase (PostgreSQL) database access via SQLAlchemy, Sentry error tracking, Pydantic validation, async patterns, and dependency injection. Covers layered architecture (routers → dependencies → services → repositories), error handling, performance monitoring, testing strategies, and best practices.
 ---
 
 # FastAPI Backend Development Guidelines
 
 ## Purpose
 
-Establish consistency and best practices across FastAPI backend services using modern Python 3.12, async patterns, SQLAlchemy 2.0, and dependency injection.
+Establish consistency and best practices across FastAPI backend services using modern Python 3.12, async patterns, Supabase (PostgreSQL) via SQLAlchemy 2.0, and dependency injection.
+
+**Tech Stack**: FastAPI + Supabase + Reflex (frontend)
 
 ## When to Use This Skill
 
@@ -30,7 +32,7 @@ Automatically activates when working on:
 - [ ] **Router**: Clean definition in `app/routers/`
 - [ ] **Dependencies**: Use FastAPI `Depends()` pattern
 - [ ] **Service**: Business logic with dependency injection
-- [ ] **Repository**: Database access with SQLAlchemy
+- [ ] **Repository**: Database access with SQLAlchemy (Supabase PostgreSQL)
 - [ ] **Validation**: Pydantic models for request/response
 - [ ] **Sentry**: Error tracking integration
 - [ ] **Tests**: Unit + integration tests with pytest
@@ -41,7 +43,7 @@ Automatically activates when working on:
 - [ ] Directory structure (see [architecture-overview.md](resources/architecture-overview.md))
 - [ ] Sentry SDK initialization
 - [ ] Pydantic Settings configuration
-- [ ] SQLAlchemy async engine setup
+- [ ] SQLAlchemy async engine setup (Supabase connection)
 - [ ] FastAPI dependency injection setup
 - [ ] Middleware stack (CORS, auth, logging)
 - [ ] Error handlers
@@ -348,9 +350,11 @@ Full working examples, end-to-end implementations
 
 ## Related Skills
 
-- **reflex-frontend-guidelines** - Frontend patterns that consume these APIs
+- **reflex-frontend-guidelines** - Frontend patterns that consume these APIs (FastAPI + Supabase + Reflex stack)
 - **error-tracking** - Sentry integration patterns
 - **skill-developer** - Meta-skill for creating and managing skills
+
+**Note**: This backend is designed to work with **Reflex frontend** (see `reflex-frontend-guidelines`). The API endpoints, request/response formats, and authentication patterns are aligned between both skill sets. Tech stack: **FastAPI + Supabase + Reflex**.
 
 ---
 
