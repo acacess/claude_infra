@@ -23,14 +23,14 @@ This repository is a **reference library** of Claude Code infrastructure compone
 
 ### Available Skills by Tech Stack
 
-This repository contains skills for **two different tech stacks**:
+This repository contains skills for **Python stack (FastAPI + Reflex)**:
 
 #### Python Stack (FastAPI + Reflex)
 
 **fastapi-backend-guidelines:**
 - Python 3.12+
 - FastAPI
-- PostgreSQL
+- Supabase (PostgreSQL)
 - SQLAlchemy ORM (async)
 - Pydantic validation
 - Sentry
@@ -39,42 +39,27 @@ This repository contains skills for **two different tech stacks**:
 - Reflex (Python web framework)
 - Python 3.12+
 - State-based architecture
-
-#### Node.js Stack (Express + React)
-
-**backend-dev-guidelines:**
-- Node.js
-- Express
-- TypeScript
-- Prisma ORM
-- Zod validation
-- Sentry
-
-**frontend-dev-guidelines:**
-- React
-- TypeScript
-- MUI v7
-- TanStack Query/Router
+- Works with FastAPI + Supabase backend
 
 ### How to Choose the Right Skills
 
 **Before integrating, ask:**
-1. "What's your backend stack: Python/FastAPI or Node.js/Express?"
-2. "What's your frontend stack: Reflex or React/TypeScript?"
+1. "What's your backend stack: Python/FastAPI or something else?"
+2. "What's your frontend stack: Reflex or something else?"
 
 **Then integrate the matching skills:**
 
 | User's Stack | Use These Skills |
 |--------------|------------------|
 | Python + FastAPI + Reflex | `fastapi-backend-guidelines` + `reflex-frontend-guidelines` |
-| Node.js + Express + React | `backend-dev-guidelines` + `frontend-dev-guidelines` |
-| Mixed or different | Offer to adapt using skills as templates |
+| Python + FastAPI only | `fastapi-backend-guidelines` |
+| Python + Reflex only | `reflex-frontend-guidelines` |
+| Different stack | Offer to adapt using skills as templates |
 
 **If user has different stack:**
 ```
 I see you're using [their stack]. This repository has skills for:
 - Python (FastAPI + Reflex)
-- Node.js (Express + React)
 
 I can:
 1. Adapt one of these skills as a template for your stack
@@ -111,7 +96,7 @@ When user says: **"Add [component] to my project"**
 
 ### Step-by-Step Process
 
-**When user requests a skill** (e.g., "add backend-dev-guidelines"):
+**When user requests a skill** (e.g., "add fastapi-backend-guidelines"):
 
 #### 1. Understand Their Project
 
@@ -151,7 +136,7 @@ ls $CLAUDE_PROJECT_DIR/.claude/skills/skill-rules.json
 **Example - User has monorepo:**
 ```json
 {
-  "backend-dev-guidelines": {
+  "fastapi-backend-guidelines": {
     "fileTriggers": {
       "pathPatterns": [
         "backend/**/*.py",
@@ -167,7 +152,7 @@ ls $CLAUDE_PROJECT_DIR/.claude/skills/skill-rules.json
 **Example - User has single backend:**
 ```json
 {
-  "backend-dev-guidelines": {
+  "fastapi-backend-guidelines": {
     "fileTriggers": {
       "pathPatterns": [
         "app/**/*.py",
@@ -216,14 +201,6 @@ cat $CLAUDE_PROJECT_DIR/.claude/skills/skill-rules.json | jq .
 - **Adaptation tip:** Architecture patterns (Routers→Dependencies→Services→Repositories) transfer to most Python frameworks
 - **Note:** This stack uses **Supabase** as the database platform (PostgreSQL with Supabase features)
 
-#### backend-dev-guidelines (Node.js/Express)
-- **Tech Requirements:** Node.js, Express, TypeScript, Prisma ORM, Sentry
-- **Ask:** "Do you use Express with Prisma?" "Where's your backend code?"
-- **If different stack:** Offer to adapt using this as template
-- **Customize:** pathPatterns
-- **Example paths:** `backend/`, `api/`, `services/*/src/`, `packages/*/src/`
-- **Adaptation tip:** Architecture patterns (Routes→Controllers→Services→Repositories) transfer to most Node.js frameworks
-
 #### reflex-frontend-guidelines (Python/Reflex)
 - **Tech Requirements:** Reflex, Python 3.12+
 - **Ask:** "Do you use Reflex?" "Where's your frontend code?"
@@ -232,14 +209,6 @@ cat $CLAUDE_PROJECT_DIR/.claude/skills/skill-rules.json | jq .
 - **Example paths:** `frontend/`, `web/`, `app/`, `reflex/`
 - **Adaptation tip:** State management and file organization patterns may transfer to similar Python web frameworks
 - **Note:** This frontend is designed to work with **FastAPI + Supabase backend** (see `fastapi-backend-guidelines`). Tech stack: **FastAPI + Supabase + Reflex**.
-
-#### frontend-dev-guidelines (React/TypeScript)
-- **Tech Requirements:** React, TypeScript, MUI v7, TanStack Query/Router
-- **Ask:** "Do you use React with TypeScript?" "Where's your frontend code?"
-- **If different stack:** Offer to create adapted version (Vue, Angular, etc.)
-- **Customize:** pathPatterns + framework-specific examples
-- **Example paths:** `frontend/`, `web/`, `apps/web/`, `src/`
-- **Adaptation tip:** Component patterns and file organization transfer across React-like frameworks, but library APIs don't
 
 #### route-tester
 - **Tech Requirements:** JWT cookie-based authentication (framework agnostic)
@@ -263,7 +232,7 @@ cat $CLAUDE_PROJECT_DIR/.claude/skills/skill-rules.json | jq .
 
 ## Adapting Skills for Different Tech Stacks
 
-When user's tech stack differs from skill requirements, you have options:
+When a user's tech stack differs from skill requirements, you have three options:
 
 ### Option 1: Adapt Existing Skill (Recommended)
 
@@ -272,8 +241,8 @@ When user's tech stack differs from skill requirements, you have options:
 **Process:**
 1. **Copy the skill as a starting point:**
    ```bash
-   cp -r showcase/.claude/skills/frontend-dev-guidelines \\
-         $CLAUDE_PROJECT_DIR/.claude/skills/vue-dev-guidelines
+   cp -r showcase/.claude/skills/reflex-frontend-guidelines \\
+         $CLAUDE_PROJECT_DIR/.claude/skills/streamlit-dev-guidelines
    ```
 
 2. **Identify what needs changing:**
@@ -298,7 +267,7 @@ When user's tech stack differs from skill requirements, you have options:
    - Update skill-rules.json triggers for their stack
    - Test activation
 
-**Example - Adapting frontend-dev-guidelines for other frameworks:**
+**Example - Adapting reflex-frontend-guidelines for other frameworks:**
 ```
 I'll create [framework]-dev-guidelines based on the Reflex skill structure:
 - Replace Reflex components → [their framework] components
@@ -327,7 +296,7 @@ This will take a few minutes. Sound good?
 
 **Example:**
 ```
-The backend-dev-guidelines uses FastAPI, but the layered architecture
+The fastapi-backend-guidelines uses FastAPI, but the layered architecture
 (Routers → Dependencies → Services → Repositories) works for Django too.
 
 I can create a skill with:
@@ -749,19 +718,19 @@ cat $CLAUDE_PROJECT_DIR/.claude/settings.json | jq .
 
 ### Example 1: Adding Backend Skill
 
-**User:** "Add the backend-dev-guidelines skill to my project"
+**User:** "Add the fastapi-backend-guidelines skill to my project"
 
 **Claude should respond:**
 ```
-I'll add the backend-dev-guidelines skill. First, I need to understand
+I'll add the fastapi-backend-guidelines skill. First, I need to understand
 your project structure:
 
 1. Is this a monorepo with multiple services, or a single backend application?
 2. Where is your backend code located? (e.g., app/, backend/, api/)
-3. Do you use FastAPI with SQLAlchemy?
+3. Do you use FastAPI with Supabase and SQLAlchemy?
 ```
 
-**User:** "Monorepo, code is in backend/app/, yes we use FastAPI with SQLAlchemy"
+**User:** "Monorepo, code is in backend/app/, yes we use FastAPI with Supabase and SQLAlchemy"
 
 **Claude should:**
 1. Copy the skill directory
@@ -769,7 +738,7 @@ your project structure:
 3. Verify it's copied correctly
 4. Respond:
 ```
-✅ Added backend-dev-guidelines skill!
+✅ Added fastapi-backend-guidelines skill!
 
 Configuration:
 - Skill triggers when editing files in backend/app/
@@ -810,7 +779,7 @@ What I did:
 - Added to your settings.json
 
 Test it: Ask me "help with backend development" and I should suggest
-the backend-dev-guidelines skill.
+the fastapi-backend-guidelines skill.
 ```
 
 ### Example 3: Adding Agent
@@ -840,11 +809,11 @@ The agent will review your code and provide architectural feedback.
 
 ### Example 3: Tech Stack Mismatch
 
-**User:** "Add the frontend-dev-guidelines skill to my Streamlit project"
+**User:** "Add the reflex-frontend-guidelines skill to my Streamlit project"
 
 **Claude should:**
 ```
-I see you're using Streamlit. The frontend-dev-guidelines skill is specifically
+I see you're using Streamlit. The reflex-frontend-guidelines skill is specifically
 designed for Reflex. I have a few options:
 
 Option 1 (Recommended): I can create a streamlit-dev-guidelines skill using the
@@ -865,7 +834,7 @@ Which would you prefer?
 **User:** "Option 1 sounds good"
 
 **Claude should:**
-1. Copy frontend-dev-guidelines as streamlit-dev-guidelines
+1. Copy reflex-frontend-guidelines as streamlit-dev-guidelines
 2. Go through each resource file
 3. Replace Reflex patterns with Streamlit components
 4. Replace Reflex state classes with Streamlit session state
@@ -898,8 +867,8 @@ Try editing a .py file in frontend/ - the skill should activate.
 | Component | Tech Requirements | Customization | What to Ask |
 |-----------|------------------|--------------|-------------|
 | **skill-developer** | None | ✅ None | Copy as-is |
-| **backend-dev-guidelines** | FastAPI/SQLAlchemy/Python | ⚠️ Paths + tech check | "Use FastAPI/SQLAlchemy?" "Where's backend?" |
-| **frontend-dev-guidelines** | Reflex | ⚠️⚠️ Paths + framework | "Use Reflex?" "Where's frontend?" |
+| **fastapi-backend-guidelines** | FastAPI/Supabase/SQLAlchemy/Python | ⚠️ Paths + tech check | "Use FastAPI/Supabase?" "Where's backend?" |
+| **reflex-frontend-guidelines** | Reflex | ⚠️⚠️ Paths + framework | "Use Reflex?" "Where's frontend?" |
 | **route-tester** | JWT cookies | ⚠️ Auth + paths | "JWT cookie auth?" |
 | **error-tracking** | Sentry | ⚠️ Paths | "Use Sentry?" "Where's backend?" |
 | **skill-activation-prompt** | ✅ None | Copy as-is |
@@ -914,7 +883,8 @@ Try editing a .py file in frontend/ - the skill should activate.
 |-----------|-----------|
 | **type-check hooks** | Single-service project or different type checking setup |
 | **route-tester** | Not using JWT cookie authentication |
-| **frontend-dev-guidelines** | Not using Reflex |
+| **reflex-frontend-guidelines** | Not using Reflex |
+| **fastapi-backend-guidelines** | Not using FastAPI + Supabase |
 | **auth agents** | Not using JWT cookie auth |
 
 ---
@@ -923,7 +893,7 @@ Try editing a .py file in frontend/ - the skill should activate.
 
 **When user says "add everything":**
 - Start with essentials: skill-activation hooks + 1-2 relevant skills
-- Don't overwhelm them with all 5 skills + 10 agents
+- Don't overwhelm them with all skills + 10 agents
 - Ask what they actually need
 
 **When something doesn't work:**
