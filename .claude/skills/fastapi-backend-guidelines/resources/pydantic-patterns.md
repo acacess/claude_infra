@@ -220,16 +220,19 @@ class BaseConfig(BaseSettings):
 class DevelopmentConfig(BaseConfig):
     """Development configuration."""
     DEBUG: bool = True
+    # For Supabase: "postgresql+asyncpg://postgres:[PASSWORD]@[PROJECT_REF].supabase.co:5432/postgres"
     DATABASE_URL: str = "postgresql://localhost/dev_db"
 
 class ProductionConfig(BaseConfig):
     """Production configuration."""
     DEBUG: bool = False
+    # For Supabase: Use connection string from environment variable
     DATABASE_URL: str  # Must be provided via env
 
 class TestConfig(BaseConfig):
     """Test configuration."""
     TESTING: bool = True
+    # For Supabase: Use test project connection string
     DATABASE_URL: str = "postgresql://localhost/test_db"
 
 def get_config() -> BaseConfig:

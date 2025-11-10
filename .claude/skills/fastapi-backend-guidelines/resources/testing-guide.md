@@ -18,6 +18,8 @@ from app.core.database import Base, get_db
 from app.core.config import settings
 
 # Test database URL
+# For local testing, use localhost. For Supabase, use your Supabase test project connection string:
+# TEST_DATABASE_URL = "postgresql+asyncpg://postgres:[PASSWORD]@[PROJECT_REF].supabase.co:5432/postgres"
 TEST_DATABASE_URL = "postgresql+asyncpg://test:test@localhost/test_db"
 
 @pytest.fixture

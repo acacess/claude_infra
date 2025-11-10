@@ -171,7 +171,7 @@ def user_card(user: dict) -> rx.Component:
     return rx.card(
         rx.heading(user["name"], size="5"),
         rx.text(user["email"]),
-        rx.button("View Profile", on_click=lambda: ...),
+        rx.button("View Profile", on_click=UserState.view_profile),
     )
 ```
 
